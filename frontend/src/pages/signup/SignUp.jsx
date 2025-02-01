@@ -18,6 +18,7 @@ const SignUp = () => {
     password: "",
     name: "",
     confirmPassword: "",
+    role: "User", 
   });
   const [loading, setLoading] = useState(false); // State for loader
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ const SignUp = () => {
         password: data.password,
         password_confirmation: data.confirmPassword,
         name: data.name,
+        role: data.role,
       });
 
       if (response.success) {
@@ -63,6 +65,7 @@ const SignUp = () => {
       setLoading(false); // Hide loader
     }
   };
+
   return (
     <div style={bgStyle}>
       <div className="min-h-[650px] md:min-h-[750px] bg-gradient-to-r from-black/90 to-green-900/70 pt-32 pb-10 md:pt-48">
@@ -148,6 +151,26 @@ const SignUp = () => {
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="Confirm your password"
                     />
+                  </div>
+
+                  {/* Role Selection Field */}
+                  <div>
+                    <label className="block text-sm font-medium">
+                      Select Role
+                    </label>
+                    <select
+                      name="role"
+                      value={data.role}
+                      onChange={handleOnChange}
+                      className="w-full p-3 border border-gray-300 rounded-md bg-black text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="User" className="bg-white text-black">
+                        User
+                      </option>
+                      <option value="Volunteer" className="bg-white text-black">
+                        Volunteer
+                      </option>
+                    </select>
                   </div>
 
                   {/* Submit Button */}

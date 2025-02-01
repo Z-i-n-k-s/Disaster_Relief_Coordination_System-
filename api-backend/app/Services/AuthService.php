@@ -21,7 +21,7 @@ class AuthService
         $user = User::create([
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => 'student', // Default role
+            'role' =>  $data['role'], 
         ]);
 
         // Check user role and save to the appropriate table
