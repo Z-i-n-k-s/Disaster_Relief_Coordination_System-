@@ -4,6 +4,7 @@ const Navbar = () => {
     const navOptions = (
       <>
        <Link to='/'> <li><a>Home</a></li></Link>
+       <Link to='admin-panel'> <li><a>ADMIN</a></li></Link>
         <li><a>About Us</a></li>
       </>
     );

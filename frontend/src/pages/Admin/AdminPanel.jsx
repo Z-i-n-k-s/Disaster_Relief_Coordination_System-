@@ -1,9 +1,20 @@
-
+import { Outlet } from "react-router-dom";
+import Sidebar, { SidebarProvider } from "../Sidebar/AdminSidebar";
 
 const AdminPanel = () => {
   return (
-    <div>AdminPanel</div>
-  )
-}
+    <SidebarProvider>
+      <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+        {/* Sidebar */}
+        <Sidebar />
 
-export default AdminPanel
+        {/* Main Content */}
+        <div className="flex-1 p-5 overflow-y-auto">
+          <Outlet />
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+};
+
+export default AdminPanel;
