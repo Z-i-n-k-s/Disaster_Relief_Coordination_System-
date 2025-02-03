@@ -7,6 +7,7 @@ import Home from "../pages/Home/home/Home";
 import Login from "../pages/login/Login";
 import SignUp from "../pages/signup/SignUp";
 import DonateForm from "../pages/donateForm/DonateForm";
+import AboutUs from "../pages/aboutus/AboutUs";
 
  export const router = createBrowserRouter([
     {
@@ -20,6 +21,11 @@ import DonateForm from "../pages/donateForm/DonateForm";
       {
         path:"donateform",
         element:<DonateForm></DonateForm>
+      },
+      {
+        path:"aboutus",
+        element:<AboutUs></AboutUs>
+
       },
       {
         path:'login',

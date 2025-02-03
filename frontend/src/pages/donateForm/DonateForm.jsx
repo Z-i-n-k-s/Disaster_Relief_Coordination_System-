@@ -1,5 +1,5 @@
 import { useState } from "react";
-import bg from '../../assets/donate.png'
+import bg from '../../assets/donate.png';
 
 const DonateForm = () => {
   const [donorData, setDonorData] = useState({
@@ -8,6 +8,16 @@ const DonateForm = () => {
     quantity: "",
     associatedCenter: "",
   });
+
+  const centers = [
+    "Dhaka Relief Center",
+    "Chattogram Aid Hub",
+    "Sylhet Support Unit",
+    "Khulna Welfare Center",
+    "Rajshahi Assistance Point",
+    "Barisal Help Center",
+    "Rangpur Emergency Base"
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,19 +95,27 @@ const DonateForm = () => {
             </div>
 
             <div>
-              <label htmlFor="associatedCenter" className="block text-lg font-medium">Associated Center</label>
-              <input
-                type="text"
+              <label htmlFor="associatedCenter" className="block text-lg font-medium">Select Center</label>
+              <select
                 id="associatedCenter"
                 name="associatedCenter"
                 value={donorData.associatedCenter}
                 onChange={handleChange}
-                className="input input-bordered w-full"
+                className="select select-bordered w-full"
                 required
-              />
+              >
+                <option value="" className="text-2xl font-bold text-white ">Select a Center</option>
+                {centers.map((center, index) => (
+                  <option key={index} value={center} className="text-gray-400">
+                    {center}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <button type="submit" className="btn mt-10 bg-yellow-300 text-black font-bold w-full">Submit Donation</button>
+            <button type="submit" className="btn mt-10 bg-yellow-300 text-black font-bold w-full">
+              Submit Donation
+            </button>
           </form>
         </div>
       </div>
