@@ -13,16 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+        Schema::create('resources', function (Blueprint $table) {
+            $table->id('ResourceID');
+            $table->string('ResourceType');
+            $table->integer('Quantity');
+            $table->dateTime('ExpirationDate');
+            $table->unsignedBigInteger('ReliefCenterID');
+            $table->foreign('ReliefCenterID')->references('CenterID')->on('relief_centers');
             $table->timestamps();
         });
     }
+    
 
     /**
      * Reverse the migrations.
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('resources');
     }
 };
