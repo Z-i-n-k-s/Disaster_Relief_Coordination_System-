@@ -1,5 +1,7 @@
 import { useState } from "react";
 import bg from '../../assets/donate.png';
+import apiClient from "../../api/Api";
+import { toast } from "react-toastify";
 
 const DonateForm = () => {
   const [donorData, setDonorData] = useState({
@@ -26,17 +28,31 @@ const DonateForm = () => {
       [name]: value,
     }));
   };
-
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(donorData);
+    try{
+      setLoading(true);
+      const response = await apiClient.submitDonation({
+        donorData
+      });
+      if(response.success){
+      console.log(donorData);
+      toast.success("Donation Submitted Successfully");
+      }
     setDonorData({
       name: "",
       donationType: "",
       quantity: "",
       associatedCenter: "",
     });
+    }catch(error){
+      console.error("Error during donation", error)
+      }finally {
+        setLoading(false); // Hide loader
+      }
   };
+
 
   return (
     <div
@@ -49,6 +65,12 @@ const DonateForm = () => {
       <div className="hero-content text-neutral-content text-center">
         <div className="max-w-md bg-black p-10 mt-20 mb-20">
           <h1 className="mb-5 text-5xl font-bold text-yellow-300 mb-10">Make a Donation</h1>
+          {loading ? (
+                <div className="flex flex-col items-center">
+                  <div className="loader border-t-4 border-blue-500 w-16 h-16 rounded-full animate-spin"></div>
+                  <p className="mt-4 text-blue-500">Donating...</p>
+                </div>
+              ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-lg font-medium">Donor's Name</label>
@@ -117,6 +139,7 @@ const DonateForm = () => {
               Submit Donation
             </button>
           </form>
+          )}
         </div>
       </div>
     </div>

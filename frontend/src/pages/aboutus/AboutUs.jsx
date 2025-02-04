@@ -48,7 +48,7 @@ const AboutUs = () => {
             <div className="absolute inset-0 z-0 mb-5">
               <img
                 src={img3}
-                className="h-[550px] w-[500px] ml-2 rounded-lg shadow-2xl object-cover grayscale transition-all duration-300 ease-in-out hover:grayscale-0"
+                className="h-[550px] w-[600px] ml-2 rounded-lg shadow-2xl object-cover grayscale transition-all duration-300 ease-in-out hover:grayscale-0"
                 alt="Image 3"
               />
             </div>
