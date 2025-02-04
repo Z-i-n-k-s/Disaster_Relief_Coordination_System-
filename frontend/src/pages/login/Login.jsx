@@ -14,8 +14,8 @@ const bgStyle = {
 
 const Login = () => {
   const [data, setData] = useState({
-    email: "",
-    password: "",
+    Email: "",
+    Password: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -35,8 +35,8 @@ const Login = () => {
 
     try {
       const response = await apiClient.login({
-        email: data.email,
-        password: data.password,
+        Email: data.Email,
+        Password: data.Password,
       });
 
       if (response.success) {
@@ -116,8 +116,8 @@ const Login = () => {
                     <label className="block text-sm font-medium">Email</label>
                     <input
                       type="email"
-                      name="email"
-                      value={data.email}
+                      name="Email"
+                      value={data.Email}
                       onChange={handleOnChange}
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="Enter your email"
@@ -132,8 +132,8 @@ const Login = () => {
                     </label>
                     <input
                       type="password"
-                      name="password"
-                      value={data.password}
+                      name="Password"
+                      value={data.Password}
                       onChange={handleOnChange}
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="Enter your password"
