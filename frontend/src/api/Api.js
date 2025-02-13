@@ -1,20 +1,18 @@
-import axios from 'axios';
+import axios from "axios";
 
 class ApiClient {
   constructor(baseURL) {
     this.client = axios.create({
       baseURL,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
   }
 
- 
-
   async register(userData) {
     try {
-      const response = await this.client.post('api/register', userData);
+      const response = await this.client.post("api/register", userData);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -23,8 +21,8 @@ class ApiClient {
 
   async login(credentials) {
     try {
-      const response = await this.client.post('api/login', credentials);
-      
+      const response = await this.client.post("api/login", credentials);
+
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -33,17 +31,25 @@ class ApiClient {
 
   async logout() {
     try {
-      const response = await this.client.get('api/logout');
-     
+      const response = await this.client.get("api/logout");
+
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   }
 
-async submitDonation(donationData) {
+  async submitDonation(donationData) {
     try {
-      const response = await this.client.post('api/donations', donationData);
+      const response = await this.client.post("api/donations", donationData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async getReliefCenters() {
+    try {
+      const response = await this.client.get("api/relief-centers");
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

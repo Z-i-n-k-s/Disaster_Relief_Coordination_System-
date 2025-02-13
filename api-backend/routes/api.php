@@ -9,13 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| auth Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
 */
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -27,6 +22,11 @@ Route::middleware(['jwt.auth'])->group(function () {
 });
 
 
+/*
+|--------------------------------------------------------------------------
+| relief-center Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/relief-centers', [ReliefCenterController::class, 'store']);
 Route::put('/relief-centers/{id}', [ReliefCenterController::class, 'update']);
@@ -35,6 +35,11 @@ Route::get('/relief-centers', [ReliefCenterController::class, 'index']); // View
 Route::get('/relief-centers/{id}', [ReliefCenterController::class, 'show']);
 
 
+/*
+|--------------------------------------------------------------------------
+| resources Routes
+|--------------------------------------------------------------------------
+*/
 
 
 Route::post('/resources', [ResourceController::class, 'store']);
@@ -46,6 +51,11 @@ Route::post('/resources/donation/{donation}', [ResourceController::class, 'handl
 Route::post('/resources/aid-prep/{aidPreparation}', [ResourceController::class, 'handleAidPreparation']); // Auto-deduct for aid
 
 
+/*
+|--------------------------------------------------------------------------
+| donations Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/donations', [DonationController::class, 'create']);
 Route::middleware('auth:api')->group(function () {

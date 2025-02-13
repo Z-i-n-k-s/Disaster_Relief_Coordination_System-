@@ -64,7 +64,7 @@ const DonateForm = () => {
       <div className="hero-overlay"></div>
       <div className="hero-content text-neutral-content text-center">
         <div className="max-w-md bg-black p-10 mt-20 mb-20">
-          <h1 className="mb-5 text-5xl font-bold text-yellow-300 mb-10">Make a Donation</h1>
+          <h1 className="mb-5 text-5xl font-bold text-yellow-300">Make a Donation</h1>
           {loading ? (
                 <div className="flex flex-col items-center">
                   <div className="loader border-t-4 border-blue-500 w-16 h-16 rounded-full animate-spin"></div>

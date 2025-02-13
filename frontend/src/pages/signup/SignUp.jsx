@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import bg from "../../assets/signup.jpg";
 import { toast, ToastContainer } from "react-toastify";
@@ -42,9 +42,9 @@ const SignUp = () => {
       toast.error("Password and Confirm Password do not match!");
       return;
     }
-
+   
     setLoading(true); // Show loader
-
+    
     try {
       const role = isVolunteer ? "Volunteer" : "User";
       const requestData = {
@@ -59,12 +59,10 @@ const SignUp = () => {
       if (isVolunteer) {
         requestData.AssignedCenter = data.AssignedCenter;
       }
+      console.log("data to submit",requestData)
 
       const response = await apiClient.register(requestData);
-      console.log("Registration Successful", response);
-
-      console.log("Password and Confirm Password are not the same");
-      console.log("Registration Successful", response);
+      
       if (response.success) {
         console.log("Registration Successful", response);
         toast.success("Registration Successful!");
@@ -79,20 +77,37 @@ const SignUp = () => {
       setLoading(false); // Hide loader
     }
   };
+  const [centers, setCenters] = useState([]);
 
-  const centers = [
-    "Dhaka Relief Center",
-    "Chattogram Aid Hub",
-    "Sylhet Support Unit",
-    "Khulna Welfare Center",
-    "Rajshahi Assistance Point",
-    "Barisal Help Center",
-    "Rangpur Emergency Base",
-  ];
+  const getReliefCenters = async () => {
+    try {
+      const response = await apiClient.getReliefCenters();
+      console.log("API Response:", response); // Debugging
+
+      if (!Array.isArray(response)) {
+        console.error("Expected an array but got:", response);
+        return;
+      }
+
+      // Extract only CenterID and CenterName
+      const filteredCenters = response.map(({ CenterID, CenterName }) => ({
+        CenterID,
+        CenterName,
+      }));
+
+      setCenters(filteredCenters);
+    } catch (error) {
+      console.error("Error fetching relief centers:", error);
+    }
+  };
+
+  useEffect(() => {
+    getReliefCenters();
+  }, []);
 
   return (
     <div style={bgStyle}>
-    <ToastContainer position="top-center" autoClose={2000} />
+      <ToastContainer position="top-center" autoClose={2000} />
       <div className="min-h-[650px] md:min-h-[750px] bg-gradient-to-r from-black/90 to-green-900/70 pt-32 pb-10 md:pt-48">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 text-white">
@@ -203,11 +218,10 @@ const SignUp = () => {
                       required
                     />
                   </div>
-
                   {isVolunteer && (
                     <div>
                       <label className="block text-sm font-medium">
-                        Assigned Center
+                        Select Center
                       </label>
                       <select
                         name="AssignedCenter"
@@ -222,13 +236,13 @@ const SignUp = () => {
                         >
                           Select a Center
                         </option>
-                        {centers.map((center, index) => (
+                        {centers.map((center) => (
                           <option
-                            key={index}
-                            value={center}
+                            key={center.CenterID}
+                            value={center.CenterID} // Store CenterID as value
                             className="bg-gray-300 text-black"
                           >
-                            {center}
+                            {center.CenterName}
                           </option>
                         ))}
                       </select>
