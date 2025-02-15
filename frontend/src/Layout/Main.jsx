@@ -3,13 +3,14 @@ import Footer from "../pages/shared/footer/Footer";
 import Navbar from "../pages/shared/navbar/Navbar";
 import { useEffect, useState } from "react";
 import Context from "../context";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUserDetails } from "../store/userSlice";
 import apiClient from "../api/Api"; // Import the apiClient
 
 const Main = () => {
   const location = useLocation();
   const dispatch = useDispatch();
+  const user = useSelector((state) => state?.user?.user);
   
   // Loading state for fetching user details
   const [loading, setLoading] = useState(true);
@@ -21,7 +22,7 @@ const Main = () => {
       if (result.success) {
         dispatch(setUserDetails(result.data));
       }
-      console.log("User details:", result);
+      console.log("User details:", result.data);
     } catch (error) {
       console.error("Error fetching user details:", error);
     } finally {
@@ -33,17 +34,17 @@ const Main = () => {
     fetchUserDetails();
   }, []);
 
+  // Hide navbar & footer for login/signup pages OR if a user is logged in
   const noHeaderFooter =
-    location.pathname.includes("login") || location.pathname.includes("signup");
+    location.pathname.includes("login") || 
+    location.pathname.includes("signup") || 
+    !!user; // Hide navbar if user exists
 
   return (
     <div>
-      <Context.Provider
-        value={{
-          fetchUserDetails,
-        }}
-      >
-        {noHeaderFooter || <Navbar />}
+      <Context.Provider value={{ fetchUserDetails }}>
+        {/* Conditionally render Navbar */}
+        {!noHeaderFooter && <Navbar />}
         
         {/* Show loading spinner if data is being fetched */}
         {loading ? (
@@ -55,7 +56,8 @@ const Main = () => {
           <Outlet />
         )}
 
-        {noHeaderFooter || <Footer />}
+        {/* Conditionally render Footer */}
+        {!noHeaderFooter && <Footer />}
       </Context.Provider>
     </div>
   );

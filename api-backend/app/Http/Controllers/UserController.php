@@ -99,13 +99,14 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'Email'    => 'sometimes|email|unique:users,Email,' . $id . ',UserID',
-            'Name'     => 'sometimes|string|max:255',
-            'Password' => 'sometimes|min:6',
-            'Role'     => 'sometimes|in:Manager,User,Volunteer',
-            'PhoneNo'  => 'nullable|string|max:20',
+            'Email'           => 'sometimes|email|unique:users,Email,' . $id . ',UserID',
+            'Name'            => 'sometimes|string|max:255',
+            'Password'        => 'sometimes|min:6',
+            'Role'            => 'sometimes|in:Manager,User,Volunteer',
+            'PhoneNo'         => 'nullable|string|max:20',
+            'AssignedCenter'  => 'nullable|integer|exists:relief_centers,CenterID',
         ]);
-
+    
         try {
             $user = $this->userService->updateUser($id, $validated);
             return response()->json([
@@ -121,6 +122,7 @@ class UserController extends Controller
             ], 404);
         }
     }
+    
 
     /**
      * Delete a user.

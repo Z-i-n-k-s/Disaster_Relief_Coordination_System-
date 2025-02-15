@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('Email')->unique(); // Unique email
             $table->string('Name');
             $table->string('Password');
-            $table->enum('Role', ['Manager', 'User', 'Volunteer']); // Enum for role
+            $table->enum('Role', ['Admin', 'User', 'Volunteer']); // Enum for role
             $table->string('PhoneNo')->nullable(); // Optional phone number
             $table->timestamps(); // Created at and Updated at timestamps
         });

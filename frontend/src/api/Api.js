@@ -161,6 +161,36 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
+  async getAllUsers() {
+    try {
+      const response = await this.client.get("api/users");
+      console.log("all users",response.data)
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async updateUser(id, userData) {
+    console.log("update data ",userData)
+    try {
+      const response = await this.client.put(`api/users/${id}`, userData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  
+  async deleteUser(id) {
+    try {
+      const response = await this.client.delete(`api/users/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  
+  
+  
 }
 
 const apiClient = new ApiClient("http://127.0.0.1:8000");

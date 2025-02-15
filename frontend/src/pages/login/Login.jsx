@@ -55,7 +55,7 @@ const Login = () => {
           case "Admin":
             toast.success(`Welcome to admin panel`);
             setTimeout(() => {
-              navigate("/admin-panel");
+              navigate("/admin-panel/all-users");
             }, 1000);
             break;
           case "Volunteer":
