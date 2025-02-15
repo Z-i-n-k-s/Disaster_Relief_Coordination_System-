@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import bg from "../../assets/login.bg.jpg";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {  toast, ToastContainer } from 'react-toastify';
 import apiClient from "../../api/Api";
+import Context from "../../context";
 
 const bgStyle = {
   backgroundImage: `url(${bg})`,
@@ -13,6 +14,7 @@ const bgStyle = {
 };
 
 const Login = () => {
+  const { fetchUserDetails } = useContext(Context);
   const [data, setData] = useState({
     Email: "",
     Password: "",
@@ -32,56 +34,58 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       const response = await apiClient.login({
         Email: data.Email,
         Password: data.Password,
       });
-
+  
       if (response.success) {
-        console.log("login Successful", response);
-        const { role } = response.user_info;
-        console.log("Role:", role);
-
+        console.log("Login Successful", response);
+        fetchUserDetails();
+  
+        // Store tokens in localStorage
+        localStorage.setItem("access_token", response.access_token);
+        localStorage.setItem("refresh_token", response.refresh_token);
+  
+        const role = response.user_info.Role;
+  
         switch (role) {
-          case "admin":
+          case "Admin":
             toast.success(`Welcome to admin panel`);
             setTimeout(() => {
               navigate("/admin-panel");
             }, 1000);
-
             break;
-          case "volunteer":
+          case "Volunteer":
             toast.success(`Welcome to volunteer panel`);
             setTimeout(() => {
               navigate("/");
             }, 1000);
-
             break;
-          case "user":
+          case "User":
             toast.success(`Welcome to user panel`);
             setTimeout(() => {
               navigate("/");
             }, 1000);
-
             break;
           default:
             console.error("Invalid role");
         }
       } else {
-        console.log("login failed", response);
-        const errorMessage = response.message || "wrong!";
+        console.log("Login failed", response);
+        const errorMessage = response.message || "Wrong credentials!";
         toast.error(errorMessage, { position: "top-center" });
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Something went wrong!";
+      const errorMessage = error.response?.data?.message || "Something went wrong!";
       toast.error(errorMessage, { position: "top-center" });
     } finally {
       setLoading(false);
     }
   };
+  
   return (
     <div style={bgStyle}>
       <ToastContainer position="top-center" autoClose={2000} />

@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import bg from "../../assets/signup.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import apiClient from "../../api/Api";
+import Context from "../../context";
 
 const bgStyle = {
   backgroundImage: `url(${bg})`,
@@ -24,6 +25,7 @@ const SignUp = () => {
     Role: "",
   });
   const [loading, setLoading] = useState(false); // State for loader
+  const { fetchUserDetails } = useContext(Context);
   const navigate = useNavigate();
 
   const handleOnChange = (e) => {
@@ -42,9 +44,9 @@ const SignUp = () => {
       toast.error("Password and Confirm Password do not match!");
       return;
     }
-   
+
     setLoading(true); // Show loader
-    
+
     try {
       const role = isVolunteer ? "Volunteer" : "User";
       const requestData = {
@@ -59,16 +61,37 @@ const SignUp = () => {
       if (isVolunteer) {
         requestData.AssignedCenter = data.AssignedCenter;
       }
-      console.log("data to submit",requestData)
+      console.log("data to submit", requestData);
 
       const response = await apiClient.register(requestData);
-      
+
       if (response.success) {
+        fetchUserDetails();
+
+        // Store tokens in localStorage
+        localStorage.setItem("access_token", response.access_token);
+        localStorage.setItem("refresh_token", response.refresh_token);
+
+        const role = response.user_info.Role;
+
         console.log("Registration Successful", response);
         toast.success("Registration Successful!");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
+        switch (role) {
+          case "Volunteer":
+            toast.success(`Welcome to volunteer panel`);
+            setTimeout(() => {
+              navigate("/");
+            }, 1000);
+            break;
+          case "User":
+            toast.success(`Welcome to user panel`);
+            setTimeout(() => {
+              navigate("/");
+            }, 1000);
+            break;
+          default:
+            console.error("Invalid role");
+        }
       }
     } catch (error) {
       console.error("Error during registration", error);
