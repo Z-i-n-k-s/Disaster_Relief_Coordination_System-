@@ -178,6 +178,15 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
+  async getAllReliefCenters() {
+    try {
+      const response = await this.client.get("api/relief-centers");
+      console.log("all users",response.data)
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
   async updateUser(id, userData) {
     console.log("update data ",userData)
     try {

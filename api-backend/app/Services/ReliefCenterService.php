@@ -32,6 +32,7 @@ class ReliefCenterService
 
     public function getAllReliefCenters()
     {
-        return ReliefCenter::all();
+        return  ReliefCenter::with(['manager', 'resources', 'volunteers', 'donations'])->get();
+
     }
 }

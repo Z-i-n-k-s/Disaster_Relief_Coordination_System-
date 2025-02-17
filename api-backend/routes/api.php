@@ -21,10 +21,10 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/logout', [AuthController::class, 'logout'])->middleware(AuthMiddleware::class); 
+Route::post('/logout', [AuthController::class, 'logout'])->middleware(AuthMiddleware::class);
 
 Route::middleware(['jwt.auth'])->group(function () {
-    
+
     Route::get('/me', [AuthController::class, 'me']);
 });
 Route::get('token/refresh', [AuthController::class, 'refreshToken']);
@@ -66,9 +66,9 @@ Route::post('/resources/aid-prep/{aidPreparation}', [ResourceController::class, 
 
 Route::post('/donations', [DonationController::class, 'create']);
 
-    // Route for users to view their donations history
-    Route::get('/donations/history', [DonationController::class, 'userDonations'])->middleware(AuthMiddleware::class); 
-    
+// Route for users to view their donations history
+Route::get('/donations/history', [DonationController::class, 'userDonations'])->middleware(AuthMiddleware::class);
+
 Route::middleware('auth:api')->group(function () {
     // Route for admins to view all donations history
     Route::get('/donations/all', [DonationController::class, 'allDonations']);
@@ -82,7 +82,7 @@ Route::middleware('auth:api')->group(function () {
 
 Route::get('/users', [UserController::class, 'index']); // Get all users
 Route::get('/users/currentUser', [UserController::class, 'show'])
-     ->middleware(AuthMiddleware::class); // Get user by ID with volunteer info
+    ->middleware(AuthMiddleware::class); // Get user by ID with volunteer info
 Route::get('/volunteers', [UserController::class, 'showAllVolunteers']); // Get all volunteers
 Route::post('/users', [UserController::class, 'store']); // Create user
 Route::put('/users/{id}', [UserController::class, 'update']); // Update user
