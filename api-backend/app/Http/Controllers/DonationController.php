@@ -20,13 +20,13 @@ class DonationController extends Controller
     {
         // Validate incoming data
         $validated = $request->validate([
-            'DonorName' => 'required|string',
-            'DonationType' => 'required|string',
-            'Quantity' => 'required|integer',
-            'DateReceived' => 'required|date',
+            'DonorName'        => 'required|string',
+            'DonationType'     => 'required|string|in:Food,Water,Clothes,Money',
+            'Quantity'         => 'required|integer',
+            'DateReceived'     => 'required|date',
             'AssociatedCenter' => 'required|integer|exists:relief_centers,CenterID',
-            'UserID' => 'required|integer|exists:users,UserID',
-            'ResourceID' => 'required|integer|exists:resources,ResourceID',
+            'UserID'           => 'required|integer|exists:users,UserID',
+            
         ]);
 
         // Call the service to create the donation
@@ -34,25 +34,26 @@ class DonationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $donation,
+            'error'   => false,
+            'data'    => $donation,
         ]);
     }
 
-    // Method for users to get their donations history
+    // Method for users to get their donation history
     public function userDonations(Request $request)
     {
-        $userId = Auth::id();  // Get the currently authenticated user ID
-        
+        $userId = $request->attributes->get('userId');
+
         $donations = $this->donationService->getUserDonations($userId);
 
         return response()->json([
             'success' => true,
-            'error'=>false,
-            'data' => $donations,
+            'error'   => false,
+            'data'    => $donations,
         ]);
     }
 
-    // Method for admins to get all donations history
+    // Method for admins to get all donation history
     public function allDonations()
     {
         // Ensure the user is an admin
@@ -67,8 +68,8 @@ class DonationController extends Controller
 
         return response()->json([
             'success' => true,
-            'error'=>false,
-            'data' => $donations,
+            'error'   => false,
+            'data'    => $donations,
         ]);
     }
 }

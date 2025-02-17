@@ -124,19 +124,17 @@ class ApiClient {
 
   async logout() {
     try {
-      const response = await this.client.get("api/logout");
+      const response = await this.client.post("api/logout");
+      console.log("response logout",response.data)
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
-    } finally {
-      // Clear tokens on logout.
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-    }
+    } 
   }
 
   async submitDonation(donationData) {
     try {
+      console.log("donation data ",donationData)
       const response = await this.client.post("api/donations", donationData);
       return response.data;
     } catch (error) {
@@ -156,6 +154,16 @@ class ApiClient {
   async getUser() {
     try {
       const response = await this.client.get("api/users/currentUser");
+      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async getUsersDonations() {
+    try {
+      const response = await this.client.get("api/donations/history");
+      
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;

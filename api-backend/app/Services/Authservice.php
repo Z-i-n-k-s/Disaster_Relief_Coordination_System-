@@ -73,29 +73,12 @@ class AuthService
         return $user;
     }
 
-    public function logout()
+    public function logout($userId)
     {
-        // Retrieve the token from the request
-        $token = JWTAuth::getToken();
-    
-        if (!$token) {
-            return response()->json([
-                'success' => false,
-                'error' => true,
-                'message' => 'Token not provided',
-            ], 401);
-        }
-    
-        try {
-            // Invalidate the access token
-            JWTAuth::invalidate($token);
-    
-            // Clear access and refresh tokens from cookies
+        if($userId){
             return true;
-            
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            throw new UnauthorizedException('Failed to log out');
-           
+        }else{
+            return false;
         }
     }
 }

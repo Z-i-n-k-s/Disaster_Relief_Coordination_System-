@@ -127,7 +127,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $res = $this->authService->logout();
+        $userId = $request->attributes->get('userId');
+        error_log($userId);
+
+        $res = $this->authService->logout($userId);
+
         if ($res) {
             return response()->json([
                 'success' => true,

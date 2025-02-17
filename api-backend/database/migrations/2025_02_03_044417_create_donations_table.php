@@ -16,7 +16,7 @@ return new class extends Migration
     Schema::create('donations', function (Blueprint $table) {
         $table->id('DonationID');
         $table->string('DonorName');
-        $table->enum('DonationType', ['Food', 'Money', 'Clothes']);
+        $table->enum('DonationType', ['Water','Food', 'Money', 'Clothes']);
         $table->integer('Quantity');
         $table->dateTime('DateReceived');
         $table->unsignedBigInteger('AssociatedCenter');

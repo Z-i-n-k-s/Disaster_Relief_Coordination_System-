@@ -34,9 +34,6 @@ class Donation extends Model
         return $this->belongsTo(ReliefCenter::class, 'AssociatedCenter');
     }
 
-    public function resource()
-    {
-        return $this->belongsTo(Resource::class, 'ResourceID');
-    }
+   
 }
 

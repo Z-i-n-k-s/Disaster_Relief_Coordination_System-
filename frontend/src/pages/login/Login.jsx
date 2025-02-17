@@ -67,7 +67,7 @@ const Login = () => {
           case "User":
             toast.success(`Welcome to user panel`);
             setTimeout(() => {
-              navigate("/");
+              navigate("/user-panel/request-aid");
             }, 1000);
             break;
           default:

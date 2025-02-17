@@ -5,7 +5,7 @@ import { FaRightFromBracket, FaUserLarge } from "react-icons/fa6";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 
-const AdminSideBar = ({ isOpen, setIsOpen, user }) => {
+const UserSideBar = ({ isOpen, setIsOpen, user }) => {
   return (
     <div
       className={`bg-black customShadow min-h-screen transition-all duration-300 ${
@@ -37,12 +37,11 @@ const AdminSideBar = ({ isOpen, setIsOpen, user }) => {
       {/* Navigation Links */}
       <nav className="flex flex-col gap-4 p-4">
         {[
-          { to: "/admin-panel/all-users", icon: <FaUsers />, label: "All Users" },
-          { to: "/admin-panel/all-relief-centers", icon: <FaBuilding />, label: "All Relief Centers" },
-          { to: "/admin-panel/all-aid-requests", icon: <FaHandsHelping />, label: "All Aid Requests" },
-          { to: "/admin-panel/aid-preparations", icon: <FaClipboardList />, label: "Aid Preparations" },
-          { to: "/admin-panel/aid-reports", icon: <FaChartBar />, label: "Aid Reports" },
-          { to: "/admin-panel/admin-logout", icon: <FaRightFromBracket />, label: "LogOut" }
+          { to: "/user-panel/request-aid", icon: <FaUsers />, label: "Request For Aid" },
+          { to: "/user-panel/donate", icon: <FaBuilding />, label: "Donate" },
+          { to: "/user-panel/all-aid-requests", icon: <FaHandsHelping />, label: "All Aid Requests" },
+          { to: "/user-panel/all-donations", icon: <FaClipboardList />, label: "All Donations" }, 
+          { to: "/user-panel/user-logout", icon: <FaRightFromBracket />, label: "LogOut" }
         ].map(({ to, icon, label }) => (
           <NavLink
             key={to}
@@ -63,4 +62,4 @@ const AdminSideBar = ({ isOpen, setIsOpen, user }) => {
   );
 };
 
-export default AdminSideBar;
+export default UserSideBar;

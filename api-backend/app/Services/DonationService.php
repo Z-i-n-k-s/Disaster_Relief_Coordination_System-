@@ -1,49 +1,57 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Donation;
 use App\Models\Resource;
-use App\Models\ReliefCenter;
+use Illuminate\Support\Facades\DB;
 
 class DonationService
 {
     // Function to handle donation creation and resource update
     public function createDonation($data)
     {
-        // Create a new donation
-        $donation = Donation::create([
-            'DonorName' => $data['DonorName'],
-            'DonationType' => $data['DonationType'],
-            'Quantity' => $data['Quantity'],
-            'DateReceived' => $data['DateReceived'],
-            'AssociatedCenter' => $data['AssociatedCenter'],
-            'UserID' => $data['UserID'],
-            'ResourceID' => $data['ResourceID'],
-        ]);
+        return DB::transaction(function () use ($data) {
+            // Create a new donation
+            $donation = Donation::create([
+                'DonorName'         => $data['DonorName'],
+                'DonationType'      => $data['DonationType'], // Enum: food, water, clothes, money
+                'Quantity'          => $data['Quantity'],
+                'DateReceived'      => $data['DateReceived'],
+                'AssociatedCenter'  => $data['AssociatedCenter'],
+                'UserID'            => $data['UserID'],
+            ]);
 
-        // Call the updateResourceFromDonation function to update the resources
-        $this->updateResourceFromDonation($data['ResourceID'], $data['Quantity']);
+            // Update or create resource
+            $this->updateResourceFromDonation(
+                $data['AssociatedCenter'],
+                $data['DonationType'],
+                $data['Quantity']
+            );
 
-        return $donation;
+            return $donation;
+        });
     }
 
     // Function to update resources based on donations
-    public function updateResourceFromDonation($resourceId, $quantity)
-    {
-        // Find the resource
-        $resource = Resource::find($resourceId);
+    public function updateResourceFromDonation($reliefCenterId, $donationType, $quantity)
+{
+    $resource = Resource::where('ReliefCenterID', $reliefCenterId)
+                        ->where('ResourceType', $donationType)
+                        ->first();
 
-        if ($resource) {
-            // Update the resource quantity
-            $resource->increment('Quantity', $quantity);
-
-            // Find the associated relief center and update
-            $reliefCenter = ReliefCenter::find($resource->ReliefCenterID);
-            if ($reliefCenter) {
-                $reliefCenter->increment('NumberOfVolunteersWorking');  // You can modify this line as needed.
-            }
-        }
+    if ($resource) {
+        $resource->increment('Quantity', $quantity);
+    } else {
+        Resource::create([
+            'ResourceType'   => $donationType,
+            'Quantity'       => $quantity,
+            'ExpirationDate' => now()->addMonths(6),
+            'ReliefCenterID' => $reliefCenterId,
+        ]);
     }
+}
+
 
     // Function to get all donations made by a specific user
     public function getUserDonations($userId)
