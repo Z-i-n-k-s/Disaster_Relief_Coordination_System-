@@ -2,65 +2,85 @@
 
 namespace App\Services;
 
-use App\Models\AidRequest;
-use App\Models\Donation;
-use App\Models\ReliefCenter;
-use App\Models\User;
-use App\Models\Volunteer;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserService
 {
+    protected function getUserById($userId)
+    {
+        $result = DB::select("SELECT * FROM users WHERE UserID = ? LIMIT 1", [$userId]);
+        if (empty($result)) {
+            throw new ModelNotFoundException("User not found.");
+        }
+        return $result[0];
+    }
+
     /**
-     * Get all users.
+     * Retrieve all users with donation/aid request counts, plus extra info for volunteers & managers.
      */
     public function getAllUsers()
     {
-        $users = User::all();
+        // Subqueries for donation/aid_request counts
+        $sql = "
+            SELECT u.*,
+                (SELECT COUNT(*) FROM donations d WHERE d.UserID = u.UserID) AS donationsCount,
+                (SELECT COUNT(*) FROM aid_requests ar WHERE ar.UserID = u.UserID) AS aidRequestsCount
+            FROM users u
+        ";
+        $users = DB::select($sql);
 
-        // Append additional info based on role
-        $usersWithInfo = $users->map(function ($user) {
-            // For regular users: count donations and aid requests.
-            if ($user->Role === 'User') {
-                $user->donationsCount   = Donation::where('UserID', $user->UserID)->count();
-                $user->aidRequestsCount = AidRequest::where('UserID', $user->UserID)->count();
-            }
-            // For volunteers: get assigned center information.
-            else if ($user->Role === 'Volunteer') {
-                $volunteer = Volunteer::where('UserID', $user->UserID)->first();
-                if ($volunteer) {
-                    // Get the assigned center info (if any).
-                    $user->assignedCenter = ReliefCenter::find($volunteer->AssignedCenter);
+        // For volunteers, fetch assigned center. For managers, fetch managed centers.
+        foreach ($users as &$user) {
+            if ($user->Role === 'Volunteer') {
+                $volunteerArr = DB::select("SELECT * FROM volunteers WHERE UserID = ? LIMIT 1", [$user->UserID]);
+                if (!empty($volunteerArr)) {
+                    $volunteer       = $volunteerArr[0];
+                    $centerArr       = DB::select("SELECT * FROM relief_centers WHERE CenterID = ? LIMIT 1", [$volunteer->AssignedCenter]);
+                    $user->assignedCenter = !empty($centerArr) ? $centerArr[0] : null;
                 } else {
                     $user->assignedCenter = null;
                 }
+            } elseif ($user->Role === 'Manager') {
+                $managedCenters = DB::select("SELECT * FROM relief_centers WHERE ManagerID = ?", [$user->UserID]);
+                $user->managedCenters = $managedCenters;
             }
-            // For managers: get all centers managed by this user.
-            else if ($user->Role === 'Manager') {
-                $user->managedCenters = ReliefCenter::where('ManagerID', $user->UserID)->get();
-            }
+        }
 
-            
-
-            return $user;
-        });
-
-        return $usersWithInfo;
+        return $users;
     }
 
     /**
-     * Get a single user along with volunteer and relief center info (if available).
+     * Get a single user with volunteer info (if volunteer).
      */
     public function getUserWithVolunteerInfo($userId)
     {
-        return User::with('volunteer.reliefCenter')->findOrFail($userId);
+        $user = $this->getUserById($userId);
+        if ($user->Role === 'Volunteer') {
+            $volunteerArr = DB::select("SELECT * FROM volunteers WHERE UserID = ? LIMIT 1", [$userId]);
+            if (!empty($volunteerArr)) {
+                $volunteer = $volunteerArr[0];
+                $centerArr = DB::select("SELECT * FROM relief_centers WHERE CenterID = ? LIMIT 1", [$volunteer->AssignedCenter]);
+                $volunteer->reliefCenter = !empty($centerArr) ? $centerArr[0] : null;
+                $user->volunteer = $volunteer;
+            } else {
+                $user->volunteer = null;
+            }
+        }
+        return $user;
     }
 
     /**
-     * Get all volunteers with their assigned relief center details.
+     * Get all volunteers (and their assigned relief center).
      */
     public function getAllVolunteers()
     {
-        return Volunteer::with('reliefCenter')->get();
+        $volunteers = DB::select("SELECT * FROM volunteers");
+        foreach ($volunteers as &$volunteer) {
+            $centerArr = DB::select("SELECT * FROM relief_centers WHERE CenterID = ? LIMIT 1", [$volunteer->AssignedCenter]);
+            $volunteer->reliefCenter = !empty($centerArr) ? $centerArr[0] : null;
+        }
+        return $volunteers;
     }
 
     /**
@@ -68,126 +88,150 @@ class UserService
      */
     public function createUser($data)
     {
-        return User::create($data);
+        return DB::transaction(function () use ($data) {
+            $columns = array_keys($data);
+            $values  = array_values($data);
+            $placeholders = implode(', ', array_fill(0, count($data), '?'));
+            $columnsStr   = implode(', ', $columns);
+
+            DB::insert("INSERT INTO users ($columnsStr) VALUES ($placeholders)", $values);
+            $userId = DB::getPdo()->lastInsertId();
+
+            return $this->getUserById($userId);
+        });
     }
 
     /**
-     * Update an existing user.
+     * Update a user and handle volunteer role transitions.
      */
-    /**
- * Update an existing user.
- */
-public function updateUser($userId, $data)
+    public function updateUser($userId, $data)
 {
-    // Find the existing user; throws an exception if not found.
-    $user = User::findOrFail($userId);
-    $oldRole = $user->Role;
+    return DB::transaction(function () use ($userId, $data) {
+        $user = $this->getUserById($userId);
+        $oldRole = $user->Role;
 
-    // If the user was previously a Volunteer, get the volunteer record.
-    $oldVolunteer = null;
-    if ($oldRole === 'Volunteer') {
-        $oldVolunteer = Volunteer::where('UserID', $userId)->first();
-    }
-
-    // Update the user with the provided data.
-    $user->update($data);
-    $newRole = $user->Role; // New role after update
-
-    // Check if an assigned center is provided in the update data.
-    $assignedCenterProvided = isset($data['AssignedCenter']) ? $data['AssignedCenter'] : null;
-
-    // --- Case 1: Transition from a non-volunteer role to Volunteer ---
-    if ($oldRole !== 'Volunteer' && $newRole === 'Volunteer') {
-        if ($assignedCenterProvided) {
-            // Create a new volunteer record for the user.
-            $volunteer = new Volunteer();
-            $volunteer->Name = $user->Name;
-            // You may set ContactInfo as needed; here we use PhoneNo as a placeholder.
-            $volunteer->ContactInfo = $user->PhoneNo; 
-            $volunteer->AssignedCenter = $assignedCenterProvided;
-            $volunteer->Status = 'Active'; // Set a default status
-            $volunteer->UserID = $userId;
-            $volunteer->save();
-
-            // Update the relief center's volunteer count.
-            $newCount = Volunteer::where('AssignedCenter', $assignedCenterProvided)->count();
-            ReliefCenter::where('CenterID', $assignedCenterProvided)
-                ->update(['NumberOfVolunteersWorking' => $newCount]);
+        // If old role was volunteer, fetch the volunteer record
+        $oldVolunteer = null;
+        if ($oldRole === 'Volunteer') {
+            $volArr = DB::select("SELECT * FROM volunteers WHERE UserID = ? LIMIT 1", [$userId]);
+            if (!empty($volArr)) {
+                $oldVolunteer = $volArr[0];
+            }
         }
-    }
-    // --- Case 2: Volunteer remains Volunteer, possibly with a changed assigned center ---
-    elseif ($oldRole === 'Volunteer' && $newRole === 'Volunteer') {
-        if ($assignedCenterProvided && $oldVolunteer) {
+
+        // Only update allowed columns from the users table
+        $allowedUserColumns = ['Email', 'Name', 'Password', 'Role', 'PhoneNo'];
+        $userData = array_intersect_key($data, array_flip($allowedUserColumns));
+        if (!empty($userData)) {
+            $columns = array_keys($userData);
+            $values  = array_values($userData);
+            $setClause = implode(', ', array_map(fn($col) => "$col = ?", $columns));
+
+            DB::update(
+                "UPDATE users SET $setClause WHERE UserID = ?",
+                array_merge($values, [$userId])
+            );
+        }
+
+        // Refresh the user record after updating
+        $user = $this->getUserById($userId);
+        $newRole = $user->Role;
+        $assignedCenterProvided = $data['AssignedCenter'] ?? null;
+
+        // 1) Non-volunteer -> Volunteer
+        if ($oldRole !== 'Volunteer' && $newRole === 'Volunteer' && $assignedCenterProvided) {
+            DB::insert(
+                "INSERT INTO volunteers (Name, ContactInfo, AssignedCenter, Status, UserID)
+                 VALUES (?, ?, ?, ?, ?)",
+                [$user->Name, $user->PhoneNo, $assignedCenterProvided, 'Active', $userId]
+            );
+            DB::update(
+                "UPDATE relief_centers
+                 SET NumberOfVolunteersWorking = (
+                     SELECT COUNT(*) FROM volunteers WHERE AssignedCenter = ?
+                 )
+                 WHERE CenterID = ?",
+                [$assignedCenterProvided, $assignedCenterProvided]
+            );
+        }
+        // 2) Volunteer -> Volunteer (possible change of center)
+        elseif ($oldRole === 'Volunteer' && $newRole === 'Volunteer' && $assignedCenterProvided && $oldVolunteer) {
             $oldAssignedCenter = $oldVolunteer->AssignedCenter;
             $newAssignedCenter = $assignedCenterProvided;
-            // If the assigned center has changed, update the volunteer record and adjust counts.
             if ($oldAssignedCenter != $newAssignedCenter) {
-                $oldVolunteer->AssignedCenter = $newAssignedCenter;
-                $oldVolunteer->save();
-
-                // Recalculate and update the volunteer count for the old assigned center.
-                $oldCount = Volunteer::where('AssignedCenter', $oldAssignedCenter)->count();
-                ReliefCenter::where('CenterID', $oldAssignedCenter)
-                    ->update(['NumberOfVolunteersWorking' => $oldCount]);
-
-                // Recalculate and update the volunteer count for the new assigned center.
-                $newCount = Volunteer::where('AssignedCenter', $newAssignedCenter)->count();
-                ReliefCenter::where('CenterID', $newAssignedCenter)
-                    ->update(['NumberOfVolunteersWorking' => $newCount]);
+                // Update volunteer record
+                DB::update(
+                    "UPDATE volunteers SET AssignedCenter = ? WHERE UserID = ?",
+                    [$newAssignedCenter, $userId]
+                );
+                // Update old center count
+                DB::update(
+                    "UPDATE relief_centers
+                     SET NumberOfVolunteersWorking = (
+                         SELECT COUNT(*) FROM volunteers WHERE AssignedCenter = ?
+                     )
+                     WHERE CenterID = ?",
+                    [$oldAssignedCenter, $oldAssignedCenter]
+                );
+                // Update new center count
+                DB::update(
+                    "UPDATE relief_centers
+                     SET NumberOfVolunteersWorking = (
+                         SELECT COUNT(*) FROM volunteers WHERE AssignedCenter = ?
+                     )
+                     WHERE CenterID = ?",
+                    [$newAssignedCenter, $newAssignedCenter]
+                );
             }
         }
-    }
-    // --- Case 3: Transition from Volunteer to a non-volunteer role ---
-    elseif ($oldRole === 'Volunteer' && $newRole !== 'Volunteer') {
-        if ($oldVolunteer) {
+        // 3) Volunteer -> Non-volunteer
+        elseif ($oldRole === 'Volunteer' && $newRole !== 'Volunteer' && $oldVolunteer) {
             $oldAssignedCenter = $oldVolunteer->AssignedCenter;
-            // Delete the volunteer record.
-            $oldVolunteer->delete();
-
-            // Update the relief center's volunteer count for the previously assigned center.
-            $newCount = Volunteer::where('AssignedCenter', $oldAssignedCenter)->count();
-            ReliefCenter::where('CenterID', $oldAssignedCenter)
-                ->update(['NumberOfVolunteersWorking' => $newCount]);
+            DB::delete("DELETE FROM volunteers WHERE UserID = ?", [$userId]);
+            DB::update(
+                "UPDATE relief_centers
+                 SET NumberOfVolunteersWorking = (
+                     SELECT COUNT(*) FROM volunteers WHERE AssignedCenter = ?
+                 )
+                 WHERE CenterID = ?",
+                [$oldAssignedCenter, $oldAssignedCenter]
+            );
         }
-    }
-    // For other role changes (non-volunteer to non-volunteer), no volunteer table or center count updates are needed.
 
-    return $user;
+        return $user;
+    });
 }
 
-
     /**
-     * Delete a user.
+     * Delete a user. If volunteer, remove volunteer record and update the center count.
      */
-    public function deleteUser($UserID)
+    public function deleteUser($userId)
     {
-        // Find the user; if not found, this will throw an exception.
-        $user = User::findOrFail($UserID);
-    
-        // If the user is a Volunteer, delete their volunteer record and update the relief center.
-        if ($user->Role === 'Volunteer') {
-            // Retrieve the volunteer record associated with the user.
-            $volunteer = Volunteer::where('UserID', $UserID)->first();
-    
-            if ($volunteer) {
-                // Store the assigned center ID before deletion.
-                $assignedCenter = $volunteer->AssignedCenter;
-    
-                // Delete the volunteer record.
-                Volunteer::where('UserID', $UserID)->delete();
-    
-                // Recalculate the number of volunteers working in the assigned center.
-                $newCount = Volunteer::where('AssignedCenter', $assignedCenter)->count();
-    
-                // Update the relief center's NumberOfVolunteersWorking field.
-               ReliefCenter::where('CenterID', $assignedCenter)
-                    ->update(['NumberOfVolunteersWorking' => $newCount]);
-            }
-        }
-    
-        // Finally, delete the user.
-        return $user->delete();
-    }
-    
+        return DB::transaction(function () use ($userId) {
+            $user = $this->getUserById($userId);
 
+            // If volunteer, delete volunteer record and update center count
+            if ($user->Role === 'Volunteer') {
+                $volArr = DB::select("SELECT * FROM volunteers WHERE UserID = ? LIMIT 1", [$userId]);
+                if (!empty($volArr)) {
+                    $volunteer = $volArr[0];
+                    $assignedCenter = $volunteer->AssignedCenter;
+
+                    DB::delete("DELETE FROM volunteers WHERE UserID = ?", [$userId]);
+                    DB::update(
+                        "UPDATE relief_centers
+                         SET NumberOfVolunteersWorking = (
+                             SELECT COUNT(*) FROM volunteers WHERE AssignedCenter = ?
+                         )
+                         WHERE CenterID = ?",
+                        [$assignedCenter, $assignedCenter]
+                    );
+                }
+            }
+
+            // Finally, delete the user record
+            DB::delete("DELETE FROM users WHERE UserID = ?", [$userId]);
+            return true;
+        });
+    }
 }

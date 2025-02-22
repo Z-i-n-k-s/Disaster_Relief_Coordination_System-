@@ -1,72 +1,123 @@
 <?php
+
 namespace App\Services;
 
-use App\Models\Resource;
-use App\Models\Donation;
-use App\Models\AidPreparation;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Carbon;
 
 class ResourceService
 {
+    /**
+     * Create a new resource.
+     */
     public function createResource($data)
     {
-        return Resource::create($data);
+        return DB::transaction(function () use ($data) {
+            $columns = array_keys($data);
+            $values  = array_values($data);
+            $placeholders = implode(', ', array_fill(0, count($data), '?'));
+            $columnsStr   = implode(', ', $columns);
+
+            DB::insert("INSERT INTO resources ($columnsStr) VALUES ($placeholders)", $values);
+            $id = DB::getPdo()->lastInsertId();
+
+            return $this->getResourceById($id);
+        });
     }
 
+    /**
+     * Update an existing resource.
+     */
     public function updateResource($id, $data)
     {
-        $resource = Resource::findOrFail($id);
-        $resource->update($data);
-        return $resource;
+        return DB::transaction(function () use ($id, $data) {
+            $this->getResourceById($id);
+
+            $columns = array_keys($data);
+            $values  = array_values($data);
+            $setClause = implode(', ', array_map(fn($col) => "$col = ?", $columns));
+
+            DB::update(
+                "UPDATE resources SET $setClause WHERE ResourceID = ?",
+                array_merge($values, [$id])
+            );
+
+            return $this->getResourceById($id);
+        });
     }
 
+    /**
+     * Delete a resource.
+     */
     public function deleteResource($id)
     {
-        $resource = Resource::findOrFail($id);
-        $resource->delete();
-        return true;
+        return DB::transaction(function () use ($id) {
+            $this->getResourceById($id);
+            DB::delete("DELETE FROM resources WHERE ResourceID = ?", [$id]);
+            return true;
+        });
     }
 
+    /**
+     * Retrieve a single resource by ID.
+     */
     public function getResourceById($id)
     {
-        return Resource::findOrFail($id);
+        $result = DB::select("SELECT * FROM resources WHERE ResourceID = ? LIMIT 1", [$id]);
+        if (empty($result)) {
+            throw new ModelNotFoundException("Resource not found.");
+        }
+        return $result[0];
     }
 
+    /**
+     * Retrieve all resources.
+     */
     public function getAllResources()
     {
-        return Resource::all();
+        return DB::select("SELECT * FROM resources");
     }
 
-    public function updateResourceFromDonation(Donation $donation)
+    /**
+     * Update or insert a resource based on a donation (if no trigger is used).
+     */
+    public function updateResourceFromDonation($donation)
     {
-        $resource = Resource::firstOrCreate(
+        $expirationDate = Carbon::parse($donation->DateReceived)->addMonths(6)->toDateTimeString();
+        DB::insert(
+            "INSERT INTO resources (ResourceType, Quantity, ExpirationDate, ReliefCenterID)
+             VALUES (?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE Quantity = Quantity + VALUES(Quantity)",
             [
-                'ResourceType' => $donation->DonationType,
-                'ReliefCenterID' => $donation->AssociatedCenter,
-            ],
-            [
-                'Quantity' => 0,
-                'ExpirationDate' => null
+                $donation->DonationType,
+                $donation->Quantity,
+                $expirationDate,
+                $donation->AssociatedCenter
             ]
         );
 
-        $resource->Quantity += $donation->Quantity;
-        $resource->save();
-
-        return $resource;
+        // Return the updated or newly created resource
+        $sql = "SELECT * FROM resources WHERE ResourceType = ? AND ReliefCenterID = ? LIMIT 1";
+        $resource = DB::select($sql, [$donation->DonationType, $donation->AssociatedCenter]);
+        return $resource[0] ?? null;
     }
 
-    public function deductResourceForAidPreparation(AidPreparation $aidPreparation)
+    /**
+     * Deduct a resource quantity for an AidPreparation record.
+     */
+    public function deductResourceForAidPreparation($aidPreparation)
     {
-        $resource = Resource::findOrFail($aidPreparation->ResourceID);
-        
-        if ($resource->Quantity < $aidPreparation->QuantityUsed) {
-            throw new \Exception("Not enough resources available.");
-        }
+        return DB::transaction(function () use ($aidPreparation) {
+            $resource = $this->getResourceById($aidPreparation->ResourceID);
+            if ($resource->Quantity < $aidPreparation->QuantityUsed) {
+                throw new \Exception("Not enough resources available.");
+            }
 
-        $resource->Quantity -= $aidPreparation->QuantityUsed;
-        $resource->save();
+            $newQuantity = $resource->Quantity - $aidPreparation->QuantityUsed;
+            DB::update("UPDATE resources SET Quantity = ? WHERE ResourceID = ?", [$newQuantity, $aidPreparation->ResourceID]);
 
-        return $resource;
+            return $this->getResourceById($aidPreparation->ResourceID);
+        });
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\DonationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
 
 class DonationController extends Controller
 {
@@ -15,10 +16,9 @@ class DonationController extends Controller
         $this->donationService = $donationService;
     }
 
-    // Method to handle creating a donation
+    // Create a donation and update resources accordingly.
     public function create(Request $request)
     {
-        // Validate incoming data
         $validated = $request->validate([
             'DonorName'        => 'required|string',
             'DonationType'     => 'required|string|in:Food,Water,Clothes,Money',
@@ -26,50 +26,69 @@ class DonationController extends Controller
             'DateReceived'     => 'required|date',
             'AssociatedCenter' => 'required|integer|exists:relief_centers,CenterID',
             'UserID'           => 'required|integer|exists:users,UserID',
-            
         ]);
 
-        // Call the service to create the donation
-        $donation = $this->donationService->createDonation($validated);
-
-        return response()->json([
-            'success' => true,
-            'error'   => false,
-            'data'    => $donation,
-        ]);
-    }
-
-    // Method for users to get their donation history
-    public function userDonations(Request $request)
-    {
-        $userId = $request->attributes->get('userId');
-
-        $donations = $this->donationService->getUserDonations($userId);
-
-        return response()->json([
-            'success' => true,
-            'error'   => false,
-            'data'    => $donations,
-        ]);
-    }
-
-    // Method for admins to get all donation history
-    public function allDonations()
-    {
-        // Ensure the user is an admin
-        if (Auth::user()->Role !== 'Admin') {
+        try {
+            $donation = $this->donationService->createDonation($validated);
+            return response()->json([
+                'success' => true,
+                'error'   => false,
+                'data'    => $donation,
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized',
-            ], 403);
+                'error'   => true,
+                'message' => 'Donation creation failed: ' . $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
 
-        $donations = $this->donationService->getAllDonations();
+    // Get donation history for the current user.
+    public function userDonations(Request $request)
+    {
+        try {
+            $userId = $request->attributes->get('userId');
+            if (!$userId) {
+                throw new \Exception("User ID not provided");
+            }
+            $donations = $this->donationService->getUserDonations($userId);
+            return response()->json([
+                'success' => true,
+                'error'   => false,
+                'data'    => $donations,
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => true,
+                'message' => 'Error retrieving donation history: ' . $e->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+    }
 
-        return response()->json([
-            'success' => true,
-            'error'   => false,
-            'data'    => $donations,
-        ]);
+    // Get all donations (admin only).
+    public function allDonations()
+    {
+        try {
+            if (Auth::user()->Role !== 'Admin') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ], Response::HTTP_FORBIDDEN);
+            }
+            $donations = $this->donationService->getAllDonations();
+            return response()->json([
+                'success' => true,
+                'error'   => false,
+                'data'    => $donations,
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => true,
+                'message' => 'Error retrieving donations: ' . $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

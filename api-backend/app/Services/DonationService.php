@@ -2,66 +2,93 @@
 
 namespace App\Services;
 
-use App\Models\Donation;
-use App\Models\Resource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class DonationService
 {
-    // Function to handle donation creation and resource update
+    /**
+     * Create a donation and (optionally) update resources via trigger or manual call.
+     */
     public function createDonation($data)
     {
         return DB::transaction(function () use ($data) {
-            // Create a new donation
-            $donation = Donation::create([
-                'DonorName'         => $data['DonorName'],
-                'DonationType'      => $data['DonationType'], // Enum: food, water, clothes, money
-                'Quantity'          => $data['Quantity'],
-                'DateReceived'      => $data['DateReceived'],
-                'AssociatedCenter'  => $data['AssociatedCenter'],
-                'UserID'            => $data['UserID'],
-            ]);
+            // Convert ISO 8601 date to MySQL compatible datetime format
+            $dateReceived = Carbon::parse($data['DateReceived'])->toDateTimeString();
 
-            // Update or create resource
-            $this->updateResourceFromDonation(
-                $data['AssociatedCenter'],
-                $data['DonationType'],
-                $data['Quantity']
+            DB::insert(
+                "INSERT INTO donations (DonorName, DonationType, Quantity, DateReceived, AssociatedCenter, UserID)
+             VALUES (?, ?, ?, ?, ?, ?)",
+                [
+                    $data['DonorName'],
+                    $data['DonationType'],  // e.g. Food, Money, Clothes
+                    $data['Quantity'],
+                    $dateReceived,
+                    $data['AssociatedCenter'], // references relief_centers.CenterID
+                    $data['UserID']
+                ]
             );
 
-            return $donation;
+            $donationId = DB::getPdo()->lastInsertId();
+            $donation = DB::select("SELECT * FROM donations WHERE DonationID = ?", [$donationId]);
+            return $donation[0] ?? null;
         });
     }
 
-    // Function to update resources based on donations
-    public function updateResourceFromDonation($reliefCenterId, $donationType, $quantity)
-{
-    $resource = Resource::where('ReliefCenterID', $reliefCenterId)
-                        ->where('ResourceType', $donationType)
-                        ->first();
+    /**
+     * Optional: Initialize a trigger to update resources automatically after a donation insert.
+     * Typically, you'd define this in a migration.
+     */
+    public function initializeDonationTrigger()
+    {
+        $triggerSQL = "
+        CREATE TRIGGER trg_after_donation_insert
+        AFTER INSERT ON donations
+        FOR EACH ROW
+        BEGIN
+            INSERT INTO resources (ResourceType, Quantity, ExpirationDate, ReliefCenterID)
+            VALUES (NEW.DonationType, NEW.Quantity, DATE_ADD(NEW.DateReceived, INTERVAL 6 MONTH), NEW.AssociatedCenter)
+            ON DUPLICATE KEY UPDATE Quantity = Quantity + NEW.Quantity;
+        END";
 
-    if ($resource) {
-        $resource->increment('Quantity', $quantity);
-    } else {
-        Resource::create([
-            'ResourceType'   => $donationType,
-            'Quantity'       => $quantity,
-            'ExpirationDate' => now()->addMonths(6),
-            'ReliefCenterID' => $reliefCenterId,
-        ]);
+        DB::unprepared($triggerSQL);
     }
-}
 
+    /**
+     * Manually update a resource from a donation (if no trigger is used).
+     */
+    public function updateResourceFromDonation($donation)
+    {
+        $expirationDate = Carbon::parse($donation->DateReceived)->addMonths(6)->toDateTimeString();
+        DB::insert(
+            "INSERT INTO resources (ResourceType, Quantity, ExpirationDate, ReliefCenterID)
+             VALUES (?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE Quantity = Quantity + VALUES(Quantity)",
+            [
+                $donation->DonationType,
+                $donation->Quantity,
+                $expirationDate,
+                $donation->AssociatedCenter
+            ]
+        );
+    }
 
-    // Function to get all donations made by a specific user
+    /**
+     * Get all donations made by a specific user.
+     */
     public function getUserDonations($userId)
     {
-        return Donation::where('UserID', $userId)->get();
+        return DB::select(
+            "SELECT * FROM donations WHERE UserID = ?",
+            [$userId]
+        );
     }
 
-    // Function to get all donations for admin view
+    /**
+     * Get all donations (admin view).
+     */
     public function getAllDonations()
     {
-        return Donation::all();
+        return DB::select("SELECT * FROM donations");
     }
 }

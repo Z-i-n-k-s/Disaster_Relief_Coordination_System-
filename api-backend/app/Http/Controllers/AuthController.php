@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -51,12 +52,12 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validatedData = $request->validate([
-            'Email' => 'required|email|unique:users,Email',
-            'Name' => 'required|string|max:255',
-            'Password' => 'required|string|min:6|confirmed',
-            'PhoneNo' => 'required|string|max:20',
-            'Role' => 'required|in:User,Volunteer',
-            'AssignedCenter' => 'required_if:Role,Volunteer|exists:relief_centers,CenterID',
+            'Email'           => 'required|email|unique:users,Email',
+            'Name'            => 'required|string|max:255',
+            'Password'        => 'required|string|min:6|confirmed',
+            'PhoneNo'         => 'required|string|max:20',
+            'Role'            => 'required|in:User,Volunteer',
+            'AssignedCenter'  => 'required_if:Role,Volunteer|exists:relief_centers,CenterID',
         ]);
 
         if ($validatedData['Role'] === 'Volunteer') {
@@ -64,27 +65,26 @@ class AuthController extends Controller
         } else {
             $user = $this->authService->registerUser($validatedData);
         }
+        
+        // Convert raw SQL user (stdClass) to User model instance.
+        $user = User::find($user->UserID);
 
         $accessToken = JWTAuth::customClaims(['type' => 'access'])->fromUser($user);
 
         // Generate Refresh Token (5 hours)
         $refreshToken = JWTAuth::customClaims([
             'type' => 'refresh',
-            'exp' => now()->addHours(5)->timestamp // Custom expiration
+            'exp'  => now()->addHours(5)->timestamp, // Custom expiration
         ])->fromUser($user);
 
-   
-
-        // Return a successful response
         return response()->json([
-            'success' => true,
-            'error' => false,
-            'message' => 'Registration successful',
-            'user_info' => $user,
-            'access_token' => $accessToken,
+            'success'       => true,
+            'error'         => false,
+            'message'       => 'Registration successful',
+            'user_info'     => $user,
+            'access_token'  => $accessToken,
             'refresh_token' => $refreshToken
         ], 201);
-          
     }
 
     public function login(Request $request)
@@ -104,14 +104,15 @@ class AuthController extends Controller
             ], 401);
         }
     
-        // Generate tokens
+        // Convert raw SQL user (stdClass) to a User model instance
+        $user = User::find($user->UserID);
+    
+        // Generate tokens using a valid JWTSubject (User model instance)
         $accessToken = JWTAuth::customClaims(['type' => 'access'])->fromUser($user);
         $refreshToken = JWTAuth::customClaims([
             'type' => 'refresh',
             'exp'  => now()->addHours(5)->timestamp,
         ])->fromUser($user);
-    
-       
     
         return response()->json([
             'success'       => true,
@@ -123,8 +124,6 @@ class AuthController extends Controller
         ], 200);
     }
     
-
-
     public function logout(Request $request)
     {
         $userId = $request->attributes->get('userId');
@@ -135,15 +134,14 @@ class AuthController extends Controller
         if ($res) {
             return response()->json([
                 'success' => true,
-                'error' => false,
+                'error'   => false,
                 'message' => 'Logged out successfully',
             ], 200);
         } else {
             return response()->json([
                 'success' => false,
-                'error' => true,
+                'error'   => true,
                 'message' => 'Failed to log out',
-
             ], 500);
         }
     }

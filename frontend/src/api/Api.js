@@ -109,6 +109,7 @@ class ApiClient {
 
   async login(credentials) {
     try {
+      console.log(credentials)
       const response = await this.client.post("api/login", credentials);
       console.log("res from login", response);
 
