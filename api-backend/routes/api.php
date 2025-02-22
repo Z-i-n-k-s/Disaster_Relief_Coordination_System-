@@ -9,9 +9,9 @@ use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 | Auth Routes
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 */
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -20,11 +20,11 @@ Route::get('/me', [AuthController::class, 'me'])->middleware(['jwt.auth']);
 Route::get('/token/refresh', [AuthController::class, 'refreshToken']);
 
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 | Relief Center Routes
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 */
-Route::prefix('relief-centers')->group(function () {
+Route::prefix('relief-centers')->middleware(AuthMiddleware::class)->group(function () {
     Route::post('/', [ReliefCenterController::class, 'store']);
     Route::put('/{id}', [ReliefCenterController::class, 'update']);
     Route::delete('/{id}', [ReliefCenterController::class, 'destroy']);
@@ -33,11 +33,11 @@ Route::prefix('relief-centers')->group(function () {
 });
 
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 | Resource Routes
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 */
-Route::prefix('resources')->group(function () {
+Route::prefix('resources')->middleware(AuthMiddleware::class)->group(function () {
     Route::post('/', [ResourceController::class, 'store']);
     Route::put('/{id}', [ResourceController::class, 'update']);
     Route::delete('/{id}', [ResourceController::class, 'destroy']);
@@ -48,26 +48,24 @@ Route::prefix('resources')->group(function () {
 });
 
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 | Donation Routes
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 */
-Route::prefix('donations')->group(function () {
+Route::prefix('donations')->middleware(AuthMiddleware::class)->group(function () {
     Route::post('/', [DonationController::class, 'create']);
-    // For regular users: view their donation history.
-    Route::get('/history', [DonationController::class, 'userDonations'])->middleware(AuthMiddleware::class);
-    // For admins: view all donation records.
-    Route::get('/all', [DonationController::class, 'allDonations'])->middleware('auth:api');
+    Route::get('/history', [DonationController::class, 'userDonations']);
+    Route::get('/all', [DonationController::class, 'allDonations']);
 });
 
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 | User Routes
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 */
-Route::prefix('users')->group(function () {
+Route::prefix('users')->middleware(AuthMiddleware::class)->group(function () {
     Route::get('/', [UserController::class, 'index']);
-    Route::get('/currentUser', [UserController::class, 'show'])->middleware(AuthMiddleware::class);
+    Route::get('/currentUser', [UserController::class, 'show']);
     Route::get('/volunteers', [UserController::class, 'showAllVolunteers']);
     Route::post('/', [UserController::class, 'store']);
     Route::put('/{id}', [UserController::class, 'update']);
