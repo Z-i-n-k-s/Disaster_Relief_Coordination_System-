@@ -206,32 +206,36 @@ class UserService
      * Delete a user. If volunteer, remove volunteer record and update the center count.
      */
     public function deleteUser($userId)
-    {
-        return DB::transaction(function () use ($userId) {
-            $user = $this->getUserById($userId);
+{
+    return DB::transaction(function () use ($userId) {
+        $user = $this->getUserById($userId);
 
-            // If volunteer, delete volunteer record and update center count
-            if ($user->Role === 'Volunteer') {
-                $volArr = DB::select("SELECT * FROM volunteers WHERE UserID = ? LIMIT 1", [$userId]);
-                if (!empty($volArr)) {
-                    $volunteer = $volArr[0];
-                    $assignedCenter = $volunteer->AssignedCenter;
+        // If volunteer, delete volunteer record and update center count
+        if ($user->Role === 'Volunteer') {
+            $volArr = DB::select("SELECT * FROM volunteers WHERE UserID = ? LIMIT 1", [$userId]);
+            if (!empty($volArr)) {
+                $volunteer = $volArr[0];
+                $assignedCenter = $volunteer->AssignedCenter;
 
-                    DB::delete("DELETE FROM volunteers WHERE UserID = ?", [$userId]);
-                    DB::update(
-                        "UPDATE relief_centers
-                         SET NumberOfVolunteersWorking = (
-                             SELECT COUNT(*) FROM volunteers WHERE AssignedCenter = ?
-                         )
-                         WHERE CenterID = ?",
-                        [$assignedCenter, $assignedCenter]
-                    );
-                }
+                DB::delete("DELETE FROM volunteers WHERE UserID = ?", [$userId]);
+                DB::update(
+                    "UPDATE relief_centers
+                     SET NumberOfVolunteersWorking = (
+                         SELECT COUNT(*) FROM volunteers WHERE AssignedCenter = ?
+                     )
+                     WHERE CenterID = ?",
+                    [$assignedCenter, $assignedCenter]
+                );
             }
+        }
 
-            // Finally, delete the user record
-            DB::delete("DELETE FROM users WHERE UserID = ?", [$userId]);
-            return true;
-        });
-    }
+        // Remove foreign key references in donations by setting UserID to null
+        DB::update("UPDATE donations SET UserID = NULL WHERE UserID = ?", [$userId]);
+
+        // Finally, delete the user record
+        DB::delete("DELETE FROM users WHERE UserID = ?", [$userId]);
+        return true;
+    });
+}
+
 }

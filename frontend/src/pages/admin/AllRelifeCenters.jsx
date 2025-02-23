@@ -3,6 +3,7 @@ import apiClient from "../../api/Api";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { ThreeDots } from "react-loader-spinner";
+import { useNavigate } from "react-router-dom";
 
 const AllReliefCenters = () => {
   const [centers, setCenters] = useState([]);
@@ -15,6 +16,7 @@ const AllReliefCenters = () => {
   // For inline expansion of details (volunteers/donations/resources)
   const [expandedCenter, setExpandedCenter] = useState(null);
   const [expandedSection, setExpandedSection] = useState("");
+  const navigate = useNavigate();
 
   // For adding a new relief center
   const [showAddModal, setShowAddModal] = useState(false);
@@ -25,6 +27,27 @@ const AllReliefCenters = () => {
     MaxVolunteersCapacity: "",
     ManagerID: "",
   });
+
+  const [managers, setManagers] = useState([]);
+
+  // Modify fetchAllusers to only get managers
+  const fetchAllusers = async () => {
+    setShowLoader(true);
+    try {
+      const dataResponse = await apiClient.getAllUsers();
+      if (dataResponse.success) {
+        // Filter users to only get Managers
+        const managerUsers = dataResponse.data.filter(
+          (user) => user.Role === "Manager"
+        );
+        setManagers(managerUsers);
+      }
+      setShowLoader(false);
+    } catch (error) {
+      toast.error("Error fetching managers");
+      setShowLoader(false);
+    }
+  };
 
   const fetchAllReliefCenters = async () => {
     setShowLoader(true);
@@ -48,6 +71,7 @@ const AllReliefCenters = () => {
 
   useEffect(() => {
     fetchAllReliefCenters();
+    fetchAllusers();
   }, []);
 
   // Filter centers by search term (checks CenterName and Location)
@@ -58,6 +82,50 @@ const AllReliefCenters = () => {
       center.Location.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
+
+  const handleAddCenterSubmit = async (e) => {
+    // Update your existing handleAddCenterSubmit function with this improved version
+
+    e.preventDefault();
+    try {
+      // Convert numeric fields to numbers
+      const formattedData = {
+        ...newCenterData,
+        NumberOfVolunteersWorking: Number(
+          newCenterData.NumberOfVolunteersWorking
+        ),
+        MaxVolunteersCapacity: Number(newCenterData.MaxVolunteersCapacity),
+        ManagerID: Number(newCenterData.ManagerID),
+      };
+
+      // Call the API service
+      const response = await apiClient.createReliefCenter(formattedData);
+
+      if (response) {
+        toast.success("Relief center created successfully!");
+        // Reset form and refresh data
+        setShowAddModal(false);
+        setNewCenterData({
+          CenterName: "",
+          Location: "",
+          NumberOfVolunteersWorking: "",
+          MaxVolunteersCapacity: "",
+          ManagerID: "",
+        });
+        // Refresh the centers list
+        await fetchAllReliefCenters();
+      } else {
+        toast.error(response.message || "Failed to create relief center");
+      }
+    } catch (error) {
+      // Handle API errors
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to create relief center. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
 
   // Sort centers by created_at date
   const sortedCenters = [...filteredCenters].sort((a, b) => {
@@ -202,30 +270,6 @@ const AllReliefCenters = () => {
       ...prevData,
       [name]: value,
     }));
-  };
-
-  // Handle the form submission to add a new relief center
-  const handleAddCenterSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await apiClient.addReliefCenter(newCenterData);
-      if (response.success) {
-        toast.success("Relief center added successfully!");
-        setShowAddModal(false);
-        setNewCenterData({
-          CenterName: "",
-          Location: "",
-          NumberOfVolunteersWorking: "",
-          MaxVolunteersCapacity: "",
-          ManagerID: "",
-        });
-        fetchAllReliefCenters();
-      } else {
-        toast.error(response.message || "Failed to add relief center");
-      }
-    } catch (error) {
-      toast.error("An error occurred while adding the relief center.");
-    }
   };
 
   return (
@@ -456,18 +500,25 @@ const AllReliefCenters = () => {
                   />
                 </div>
               </div>
+              {/* Replace Manager ID input with dropdown */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">
-                  Manager ID
+                  Select Manager
                 </label>
-                <input
-                  type="number"
+                <select
                   name="ManagerID"
                   value={newCenterData.ManagerID}
                   onChange={handleInputChange}
                   required
                   className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none"
-                />
+                >
+                  <option value="">Select a Manager</option>
+                  {managers.map((manager) => (
+                    <option key={manager.UserID} value={manager.UserID}>
+                      {manager.Name} ({manager.Email})
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="flex justify-end space-x-4">
                 <button

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AffectedAreaController;
+use App\Http\Controllers\AidRequestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ReliefCenterController;
@@ -24,11 +26,12 @@ Route::get('/token/refresh', [AuthController::class, 'refreshToken']);
 | Relief Center Routes
 |---------------------------------------------------------------------------
 */
-Route::prefix('relief-centers')->middleware(AuthMiddleware::class)->group(function () {
+Route::get('relief-centers', [ReliefCenterController::class, 'index']);
+Route::prefix('relief-centers')->group(function () {
     Route::post('/', [ReliefCenterController::class, 'store']);
     Route::put('/{id}', [ReliefCenterController::class, 'update']);
     Route::delete('/{id}', [ReliefCenterController::class, 'destroy']);
-    Route::get('/', [ReliefCenterController::class, 'index']);
+    
     Route::get('/{id}', [ReliefCenterController::class, 'show']);
 });
 
@@ -70,4 +73,32 @@ Route::prefix('users')->middleware(AuthMiddleware::class)->group(function () {
     Route::post('/', [UserController::class, 'store']);
     Route::put('/{id}', [UserController::class, 'update']);
     Route::delete('/{id}', [UserController::class, 'destroy']);
+});
+
+/*
+|---------------------------------------------------------------------------
+| aid-request Routes
+|---------------------------------------------------------------------------
+*/
+
+Route::prefix('aid-requests')->group(function () {
+    Route::get('/', [AidRequestController::class, 'index']);      // List all aid requests
+    Route::post('/', [AidRequestController::class, 'store']);     // Create a new aid request
+    Route::get('/{id}', [AidRequestController::class, 'show']);     // Get a specific aid request
+    Route::put('/{id}', [AidRequestController::class, 'update']);   // Update an existing aid request
+    Route::delete('/{id}', [AidRequestController::class, 'destroy']); // Delete an aid request
+});
+
+/*
+|---------------------------------------------------------------------------
+| affected-areas Routes
+|---------------------------------------------------------------------------
+*/
+
+Route::prefix('affected-areas')->group(function () {
+    Route::get('/', [AffectedAreaController::class, 'index']);      // List all affected areas
+    Route::post('/', [AffectedAreaController::class, 'store']);     // Create a new affected area
+    Route::get('/{id}', [AffectedAreaController::class, 'show']);     // Retrieve a specific affected area
+    Route::put('/{id}', [AffectedAreaController::class, 'update']);   // Update an existing affected area
+    Route::delete('/{id}', [AffectedAreaController::class, 'destroy']); // Delete an affected area
 });

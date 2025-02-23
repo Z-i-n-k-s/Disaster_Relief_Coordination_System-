@@ -151,6 +151,16 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
+  async  createReliefCenter(reliefCenterData) {
+    try {
+      console.log('add relife data',reliefCenterData)
+      const response = await this.client.post("api/relief-centers/", reliefCenterData, );
+      return response.data;
+    } catch (error) {
+      // Handle errors (e.g., validation errors from the backend)
+      throw error.response ? error.response.data : error;
+    }
+  }
 
   async getUser() {
     try {

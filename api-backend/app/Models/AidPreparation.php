@@ -11,15 +11,13 @@ class AidPreparation extends Model
 
     protected $fillable = [
         'RequestID',
-        'PreparedBy',
         'DepartureTime',
         'EstimatedArrival',
-        'ResourceID',
-        'QuantityUsed',
+        'Status',
     ];
 
     protected $casts = [
-        'DepartureTime' => 'datetime',
+        'DepartureTime'    => 'datetime',
         'EstimatedArrival' => 'datetime',
     ];
 
@@ -28,14 +26,15 @@ class AidPreparation extends Model
         return $this->belongsTo(AidRequest::class, 'RequestID');
     }
 
-    public function volunteer()
+    // New relationship: each AidPreparation can have many associated resources used.
+    public function resources()
     {
-        return $this->belongsTo(Volunteer::class, 'PreparedBy');
+        return $this->hasMany(AidPreparationResource::class, 'PreparationID');
     }
 
-    public function resource()
+    // New relationship: each AidPreparation can have many associated volunteers.
+    public function volunteers()
     {
-        return $this->belongsTo(Resource::class, 'ResourceID');
+        return $this->hasMany(AidPreparationVolunteer::class, 'PreparationID');
     }
 }
-

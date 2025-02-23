@@ -8,84 +8,86 @@ use Illuminate\Support\Carbon;
 class DonationService
 {
     /**
-     * Create a donation and (optionally) update resources via trigger or manual call.
+     * Create a donation and manually update the resource.
      */
     public function createDonation($data)
     {
         return DB::transaction(function () use ($data) {
             // Convert ISO 8601 date to MySQL compatible datetime format
             $dateReceived = Carbon::parse($data['DateReceived'])->toDateTimeString();
+            $now = Carbon::now()->toDateTimeString();
 
+            // Insert a new donation using a raw SQL query including timestamp fields.
             DB::insert(
-                "INSERT INTO donations (DonorName, DonationType, Quantity, DateReceived, AssociatedCenter, UserID)
-             VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO donations (DonorName, DonationType, Quantity, DateReceived, AssociatedCenter, UserID, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 [
                     $data['DonorName'],
-                    $data['DonationType'],  // e.g. Food, Money, Clothes
+                    $data['DonationType'],  // e.g. food, water, clothes, money
                     $data['Quantity'],
                     $dateReceived,
-                    $data['AssociatedCenter'], // references relief_centers.CenterID
-                    $data['UserID']
+                    $data['AssociatedCenter'],
+                    $data['UserID'],
+                    $now,
+                    $now,
                 ]
             );
 
+            // Retrieve the last inserted donation ID.
             $donationId = DB::getPdo()->lastInsertId();
+
+            // Update or create the corresponding resource.
+            // $this->updateResourceFromDonation(
+            //     $data['AssociatedCenter'],
+            //     $data['DonationType'],
+            //     $data['Quantity']
+            // );
+
+            // Return the newly created donation record.
             $donation = DB::select("SELECT * FROM donations WHERE DonationID = ?", [$donationId]);
             return $donation[0] ?? null;
         });
     }
 
     /**
-     * Optional: Initialize a trigger to update resources automatically after a donation insert.
-     * Typically, you'd define this in a migration.
+     * Update or create a resource based on the donation using pure SQL.
      */
-    public function initializeDonationTrigger()
-    {
-        $triggerSQL = "
-        CREATE TRIGGER trg_after_donation_insert
-        AFTER INSERT ON donations
-        FOR EACH ROW
-        BEGIN
-            INSERT INTO resources (ResourceType, Quantity, ExpirationDate, ReliefCenterID)
-            VALUES (NEW.DonationType, NEW.Quantity, DATE_ADD(NEW.DateReceived, INTERVAL 6 MONTH), NEW.AssociatedCenter)
-            ON DUPLICATE KEY UPDATE Quantity = Quantity + NEW.Quantity;
-        END";
+    // public function updateResourceFromDonation($reliefCenterId, $donationType, $quantity)
+    // {
+    //     // Check if a resource exists for the given relief center and donation type.
+    //     $resource = DB::select(
+    //         "SELECT * FROM resources WHERE ReliefCenterID = ? AND ResourceType = ? LIMIT 1",
+    //         [$reliefCenterId, $donationType]
+    //     );
 
-        DB::unprepared($triggerSQL);
-    }
-
-    /**
-     * Manually update a resource from a donation (if no trigger is used).
-     */
-    public function updateResourceFromDonation($donation)
-    {
-        $expirationDate = Carbon::parse($donation->DateReceived)->addMonths(6)->toDateTimeString();
-        DB::insert(
-            "INSERT INTO resources (ResourceType, Quantity, ExpirationDate, ReliefCenterID)
-             VALUES (?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE Quantity = Quantity + VALUES(Quantity)",
-            [
-                $donation->DonationType,
-                $donation->Quantity,
-                $expirationDate,
-                $donation->AssociatedCenter
-            ]
-        );
-    }
+    //     if ($resource) {
+    //         // If the resource exists, increment its quantity.
+    //         DB::update(
+    //             "UPDATE resources SET Quantity = Quantity + ? WHERE ReliefCenterID = ? AND ResourceType = ?",
+    //             [$quantity, $reliefCenterId, $donationType]
+    //         );
+    //     } else {
+    //         // If not, create a new resource with an expiration date 6 months from now.
+    //         $expirationDate = Carbon::now()->addMonths(6)->toDateTimeString();
+    //         $now = Carbon::now()->toDateTimeString();
+    //         DB::insert(
+    //             "INSERT INTO resources (ResourceType, Quantity, ExpirationDate, ReliefCenterID, created_at, updated_at)
+    //              VALUES (?, ?, ?, ?, ?, ?)",
+    //             [$donationType, $quantity, $expirationDate, $reliefCenterId, $now, $now]
+    //         );
+    //     }
+    // }
 
     /**
      * Get all donations made by a specific user.
      */
     public function getUserDonations($userId)
     {
-        return DB::select(
-            "SELECT * FROM donations WHERE UserID = ?",
-            [$userId]
-        );
+        return DB::select("SELECT * FROM donations WHERE UserID = ?", [$userId]);
     }
 
     /**
-     * Get all donations (admin view).
+     * Get all donations for admin view.
      */
     public function getAllDonations()
     {

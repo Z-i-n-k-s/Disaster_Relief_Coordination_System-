@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon; // Import Carbon to handle timestamps
 
 class AuthService
 {
@@ -14,14 +14,15 @@ class AuthService
     {
         return DB::transaction(function () use ($data) {
             DB::insert(
-                "INSERT INTO users (Email, Name, Password, Role, PhoneNo)
-                 VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO users (Email, Name, Password, Role, PhoneNo, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?)",
                 [
                     $data['Email'],
                     $data['Name'],
                     Hash::make($data['Password']),
                     'User',
-                    $data['PhoneNo']
+                    $data['PhoneNo'],
+                    Carbon::now()  // Sets the current timestamp
                 ]
             );
 
@@ -38,30 +39,32 @@ class AuthService
     public function registerVolunteer($data)
     {
         return DB::transaction(function () use ($data) {
-            // Insert into users table
+            // Insert into users table with created_at timestamp
             DB::insert(
-                "INSERT INTO users (Email, Name, Password, Role, PhoneNo)
-                 VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO users (Email, Name, Password, Role, PhoneNo, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?)",
                 [
                     $data['Email'],
                     $data['Name'],
                     Hash::make($data['Password']),
                     'Volunteer',
-                    $data['PhoneNo']
+                    $data['PhoneNo'],
+                    Carbon::now()
                 ]
             );
             $userId = DB::getPdo()->lastInsertId();
 
-            // Insert into volunteers table
+            // Insert into volunteers table with created_at timestamp (if the column exists)
             DB::insert(
-                "INSERT INTO volunteers (Name, ContactInfo, AssignedCenter, Status, UserID)
-                 VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO volunteers (Name, ContactInfo, AssignedCenter, Status, UserID, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?)",
                 [
                     $data['Name'],
                     $data['PhoneNo'],
                     $data['AssignedCenter'],  // references relief_centers.CenterID
                     'Active',
-                    $userId
+                    $userId,
+                    Carbon::now()
                 ]
             );
 
