@@ -1,11 +1,11 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaUsers, FaBuilding, FaHandsHelping, FaClipboardList, FaChartBar, FaBars } from "react-icons/fa";
+import { FaClipboardList, FaHandsHelping, FaChartBar, FaBars } from "react-icons/fa";
 import { FaRightFromBracket, FaUserLarge } from "react-icons/fa6";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 
-const AdminSideBar = ({ isOpen, setIsOpen, user }) => {
+const VolunteerSideBar = ({ isOpen, setIsOpen, volunteer }) => {
   return (
     <div
       className={`bg-black customShadow min-h-screen transition-all duration-300 ${
@@ -20,9 +20,9 @@ const AdminSideBar = ({ isOpen, setIsOpen, user }) => {
         {isOpen && (
           <>
             <p className="capitalize text-lg font-bold text-white mt-2">
-              {user?.Name}
+              {volunteer?.Name}
             </p>
-            <p className="text-sm text-white">{user?.Role}</p>
+            <p className="text-sm text-white">{volunteer?.Role}</p>
           </>
         )}
       </div>
@@ -37,13 +37,10 @@ const AdminSideBar = ({ isOpen, setIsOpen, user }) => {
       {/* Navigation Links */}
       <nav className="flex flex-col gap-4 p-4">
         {[
-          { to: "/admin-panel/all-users", icon: <FaUsers />, label: "All Users" },
-          { to: "/admin-panel/affected-area", icon: <FaUsers />, label: "All Affected Areas" },
-          { to: "/admin-panel/all-relief-centers", icon: <FaBuilding />, label: "All Relief Centers" },
-          { to: "/admin-panel/all-aid-requests", icon: <FaHandsHelping />, label: "All Aid Requests" },
-          { to: "/admin-panel/aid-preparations", icon: <FaClipboardList />, label: "Aid Preparations" },
-          { to: "/admin-panel/aid-reports", icon: <FaChartBar />, label: "Aid Reports" },
-          { to: "/admin-panel/admin-logout", icon: <FaRightFromBracket />, label: "LogOut" }
+          { to: "/volunteer-panel/assigned-tasks", icon: <FaClipboardList />, label: "Assigned Tasks" },
+          { to: "/volunteer-panel/aids-prepared", icon: <FaHandsHelping />, label: "Aids Prepared" },
+          { to: "/volunteer-panel/all-participations", icon: <FaChartBar />, label: "All Participations" },
+          { to: "/volunteer-panel/vol-logout", icon: <FaRightFromBracket />, label: "Logout" },
         ].map(({ to, icon, label }) => (
           <NavLink
             key={to}
@@ -64,4 +61,4 @@ const AdminSideBar = ({ isOpen, setIsOpen, user }) => {
   );
 };
 
-export default AdminSideBar;
+export default VolunteerSideBar;

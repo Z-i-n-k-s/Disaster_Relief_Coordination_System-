@@ -13,6 +13,8 @@ DROP TABLE IF EXISTS relief_centers;
 DROP TABLE IF EXISTS users;
 
 -- Create tables with consistent column names
+
+
 CREATE TABLE users (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
     Email VARCHAR(255) NOT NULL,
@@ -178,7 +180,7 @@ CREATE TABLE rescue_tracking_volunteers (
          REFERENCES volunteers(VolunteerID) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
--- Updated Triggers with correct column names
+-- Triggers with correct column names
 -- First add unique constraint to prevent duplicate resources
 ALTER TABLE resources
 ADD UNIQUE INDEX idx_resource_unique (ResourceType, ReliefCenterID);
@@ -187,7 +189,7 @@ ALTER TABLE donations DROP COLUMN ResourceID;
 -- Drop existing trigger
 DROP TRIGGER IF EXISTS trg_update_resource_after_donation;
 
--- Create corrected trigger
+-- Create  trigger
 DELIMITER $$
 CREATE TRIGGER trg_update_resource_after_donation
 AFTER INSERT ON donations

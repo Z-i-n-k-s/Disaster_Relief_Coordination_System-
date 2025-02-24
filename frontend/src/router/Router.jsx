@@ -17,6 +17,11 @@ import RequestAid from "../pages/user/RequestAid";
 import Donate from "../pages/user/Donate";
 import UserAidRequests from "../pages/user/UserAidRequests";
 import UserDonations from "../pages/user/UserDonations";
+import AssignedTasks from "../pages/volunteer/AssignedTasks";
+import AidsPrepared from "../pages/volunteer/AidsPrepared";
+import AllParticipations from "../pages/volunteer/AllParticipations";
+import VolunteerPanel from "../pages/volunteer/VolunteerPanel";
+import AffectedAreas from "../pages/admin/AffectedAreas";
 
 export const router = createBrowserRouter([
   {
@@ -69,25 +74,29 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      // {
-      //   path: "volunteer-panel",
-      //   element: <VolunteerPanel />,
-      //   children: [
-      //     {
-      //       path: "assigned-tasks",
-      //       element: <AssignedTasks />,
-      //     },
-      //     {
-      //       path: "aids-prepared",
-      //       element: <AidsPrepared/>,
-      //     },
-      //     {
-      //       path: "all-participations",
-      //       element: <AllParticipations />,
-      //     },
+      {
+        path: "volunteer-panel",
+        element: <VolunteerPanel />,
+        children: [
+          {
+            path: "assigned-tasks",
+            element: <AssignedTasks />,
+          },
+          {
+            path: "aids-prepared",
+            element: <AidsPrepared />,
+          },
+          {
+            path: "all-participations",
+            element: <AllParticipations />,
+          },
+          {
+            path: "vol-logout",
+            element: <Logout />,
+          },
         
-      //   ],
-      // },
+        ],
+      },
        {
         path: "admin-panel",
         element: <AdminPanel />,
@@ -95,6 +104,10 @@ export const router = createBrowserRouter([
           {
             path: "all-users",
             element: <AllUsers />,
+          },
+          {
+            path: "affected-area",
+            element: <AffectedAreas />,
           },
           {
             path: "all-relief-centers",
