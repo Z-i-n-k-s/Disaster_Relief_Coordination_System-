@@ -26,6 +26,17 @@ class AidRequestController extends Controller
         }
     }
 
+    // Get all aid requests for a specific user
+    public function getUserRequests($userId)
+    {
+        try {
+            $aidRequests = $this->aidRequestService->getByUser($userId);
+            return response()->json($aidRequests, 200);
+        } catch(Exception $e) {
+            return response()->json(['error' => 'Error fetching aid requests for the user'], 500);
+        }
+    }
+
     // Create a new aid request
     public function store(Request $request)
     {
@@ -34,6 +45,7 @@ class AidRequestController extends Controller
             $aidRequest = $this->aidRequestService->create($data);
             return response()->json($aidRequest, 201);
         } catch(Exception $e) {
+            error_log($e);
             return response()->json(['error' => 'Error creating aid request'], 500);
         }
     }
@@ -80,4 +92,28 @@ class AidRequestController extends Controller
             return response()->json(['error' => 'Error deleting aid request'], 500);
         }
     }
+    public function updateStatus(Request $request, $id)
+    {
+        // Validate that the provided status is one of the allowed values.
+        $request->validate([
+            'status' => 'required|string|in:Pending,In Progress,Completed',
+        ]);
+        
+        try {
+            // Retrieve the validated status value.
+            $newStatus = $request->input('status');
+            
+            // Call the service method to update the status.
+            $affected = $this->aidRequestService->updateStatus($id, $newStatus);
+            return response()->json([
+                'message' => 'Status updated successfully',
+                'affected' => $affected,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
 }

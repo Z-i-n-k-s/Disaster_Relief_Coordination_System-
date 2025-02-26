@@ -82,6 +82,9 @@ Route::prefix('users')->middleware(AuthMiddleware::class)->group(function () {
 */
 
 Route::prefix('aid-requests')->group(function () {
+    Route::get('/user/{userId}', [AidRequestController::class, 'getUserRequests']);
+    Route::patch('/{id}/status', [AidRequestController::class, 'updateStatus']);
+
     Route::get('/', [AidRequestController::class, 'index']);      // List all aid requests
     Route::post('/', [AidRequestController::class, 'store']);     // Create a new aid request
     Route::get('/{id}', [AidRequestController::class, 'show']);     // Get a specific aid request

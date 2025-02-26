@@ -113,9 +113,7 @@ class ApiClient {
       const response = await this.client.post("api/login", credentials);
       console.log("res from login", response);
 
-      // Store tokens after a successful login.
-      localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("refresh_token", response.data.refresh_token);
+     
 
       return response.data;
     } catch (error) {
@@ -198,6 +196,40 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
+  async createAffectedArea(areaData) {
+    try {
+      console.log('new area ',areaData)
+      const response = await this.client.post("api/affected-areas",areaData);
+      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async getAffectedArea() {
+    try {
+      const response = await this.client.get("api/affected-areas");      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async updateAffectedArea(id, areaData) {
+    try {
+      const response = await this.client.put(`api/affected-areas/${id}`,areaData);      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async deleteAffectedArea(id) {
+    try {
+      const response = await this.client.delete(`api/affected-areas/${id}`);      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
   async updateUser(id, userData) {
     console.log("update data ",userData)
     try {
@@ -217,7 +249,48 @@ class ApiClient {
     }
   }
   
-  
+  async createAidRequest(reqData) {
+    try {
+      console.log('new req ',reqData)
+      const response = await this.client.post("api/aid-requests",reqData);
+      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+
+  async getUsersAidRequest(id) {
+    try {
+    //  console.log('new req ',reqData)
+      const response = await this.client.get(`api/aid-requests/user/${id}`);
+    //  console.log(response);
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async getAllAidRequest() {
+    try {
+    //  console.log('new req ',reqData)
+      const response = await this.client.get(`api/aid-requests`);
+     // console.log(response);
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async updateAidRequestStatus(id, status) {
+    try {
+      console.log('new req ', id, status);
+      // Send the status as an object { status: "value" }
+      const response = await this.client.patch(`api/aid-requests/${id}/status`, { status });
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
   
 }
 

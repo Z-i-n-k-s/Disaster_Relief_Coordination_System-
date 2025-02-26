@@ -1,16 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiEdit } from "react-icons/fi";
 import { MdDelete } from "react-icons/md";
+import { toast } from "react-toastify";
+import { ThreeDots } from "react-loader-spinner";
+import apiClient from "../../api/Api";
 
 const AffectedAreas = () => {
-  // Demo data for affected areas
-  const demoData = [
-    { AreaID: 1, AreaName: "Downtown", AreaType: "Flood", SeverityLevel: "High", Population: 1500 },
-    { AreaID: 2, AreaName: "Uptown", AreaType: "Earthquake", SeverityLevel: "Medium", Population: 800 },
-    { AreaID: 3, AreaName: "Midtown", AreaType: "Fire", SeverityLevel: "Low", Population: 1200 },
-  ];
-
-  const [areas, setAreas] = useState(demoData);
+  const [areas, setAreas] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterSeverity, setFilterSeverity] = useState("all");
@@ -18,13 +14,33 @@ const AffectedAreas = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openNewModal, setOpenNewModal] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
+  const [showLoader, setShowLoader] = useState(false);
+
+  // Function to fetch affected areas from the backend.
+  const fetchAreas = async () => {
+    try {
+      setShowLoader(true);
+      const data = await apiClient.getAffectedArea();
+      setAreas(data);
+    } catch (error) {
+      toast.error("Failed to load affected areas.");
+    } finally {
+      setShowLoader(false);
+    }
+  };
+
+  // Fetch data on mount.
+  useEffect(() => {
+    fetchAreas();
+  }, []);
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleFilterChange = (e) => setFilterType(e.target.value);
   const handleSeverityFilterChange = (e) => setFilterSeverity(e.target.value);
 
-  // Filter areas based on search term, Area Type, and Severity Level
+  // Filter areas based on search term, Area Type, and Severity Level.
   const filteredAreas = areas.filter((area) => {
+    if (!area || !area.AreaName) return false;
     const matchesSearch = area.AreaName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType === "all" || area.AreaType === filterType;
     const matchesSeverity = filterSeverity === "all" || area.SeverityLevel === filterSeverity;
@@ -46,31 +62,80 @@ const AffectedAreas = () => {
     setOpenNewModal(true);
   };
 
-  // Save new or edited area
-  const saveArea = () => {
+  // Update an affected area via API.
+  const saveArea = async () => {
     if (selectedArea.AreaID) {
-      // Edit existing area
-      setAreas((prev) =>
-        prev.map((area) => (area.AreaID === selectedArea.AreaID ? selectedArea : area))
-      );
-    } else {
-      // Add new area with simulated auto-increment AreaID
-      const newArea = {
-        ...selectedArea,
-        AreaID: areas.length ? areas[areas.length - 1].AreaID + 1 : 1,
-      };
-      setAreas((prev) => [...prev, newArea]);
+      try {
+        setShowLoader(true);
+        await apiClient.updateAffectedArea(selectedArea.AreaID, selectedArea);
+        toast.success("Area updated successfully!");
+        await fetchAreas(); // Refresh data after update.
+      } catch (error) {
+        const errorMessage =
+          error.response?.data?.message || error.message || "Failed to update area.";
+        toast.error(errorMessage);
+      } finally {
+        setShowLoader(false);
+        setOpenEditModal(false);
+        setSelectedArea(null);
+      }
     }
-    setOpenEditModal(false);
-    setOpenNewModal(false);
-    setSelectedArea(null);
   };
 
-  // Confirm deletion of area
-  const confirmDelete = () => {
-    setAreas((prev) => prev.filter((area) => area.AreaID !== selectedArea.AreaID));
-    setOpenDeleteModal(false);
-    setSelectedArea(null);
+  // Create a new area via API.
+  const handleAddAreaSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setShowLoader(true);
+      const areaData = { ...selectedArea };
+      const response = await apiClient.createAffectedArea(areaData);
+      if (response) {
+        toast.success("Area created successfully!");
+        await fetchAreas(); // Refresh data after creation.
+        setOpenNewModal(false);
+        setSelectedArea(null);
+      } else {
+        toast.error(response.message || "Failed to create area.");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to create area. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setShowLoader(false);
+    }
+  };
+
+  // Delete an affected area via API.
+  const confirmDelete = async () => {
+    try {
+      setShowLoader(true);
+      await apiClient.deleteAffectedArea(selectedArea.AreaID);
+      toast.success("Area deleted successfully!");
+      await fetchAreas(); // Refresh data after deletion.
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to delete area. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setShowLoader(false);
+      setOpenDeleteModal(false);
+      setSelectedArea(null);
+    }
+  };
+
+  // Unified submit handler for modal form.
+  const handleAreaSubmit = (e) => {
+    e.preventDefault();
+    if (selectedArea && selectedArea.AreaID) {
+      saveArea();
+    } else {
+      handleAddAreaSubmit(e);
+    }
   };
 
   return (
@@ -164,21 +229,38 @@ const AffectedAreas = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredAreas.length > 0 ? (
+            {showLoader ? (
+              <tr>
+                <td colSpan="6" className="text-center p-4">
+                  <div className="flex justify-center items-center">
+                    <ThreeDots color="#7542ff" height={80} width={80} />
+                  </div>
+                </td>
+              </tr>
+            ) : filteredAreas.length > 0 ? (
               filteredAreas.map((area, index) => (
                 <tr key={area.AreaID} className="hover:bg-gray-700">
-                  <td className="px-4 py-2 text-center border-b border-gray-600">{index + 1}</td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">{area.AreaName}</td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">{area.AreaType}</td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">{area.SeverityLevel}</td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">{area.Population}</td>
+                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                    {index + 1}
+                  </td>
+                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                    {area.AreaName}
+                  </td>
+                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                    {area.AreaType}
+                  </td>
+                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                    {area.SeverityLevel}
+                  </td>
+                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                    {area.Population}
+                  </td>
                   <td className="px-4 py-2 text-center border-b border-gray-600">
                     <div className="flex justify-center gap-2">
                       <button
                         className="bg-green-500 text-white p-2 rounded-full transition-transform duration-200 transform hover:scale-110"
                         onClick={() => handleEdit(area)}
                       >
-                       
                         <FiEdit />
                       </button>
                       <button
@@ -209,74 +291,79 @@ const AffectedAreas = () => {
             <h2 className="text-xl font-bold mb-4 text-yellow-500">
               {selectedArea && selectedArea.AreaID ? "Edit Area" : "New Area"}
             </h2>
-            <div className="mb-4">
-              <label className="block text-yellow-500 mb-1">Area Name:</label>
-              <input
-                type="text"
-                value={selectedArea?.AreaName || ""}
-                onChange={(e) =>
-                  setSelectedArea({ ...selectedArea, AreaName: e.target.value })
-                }
-                className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-yellow-500 mb-1">Area Type:</label>
-              <select
-                value={selectedArea?.AreaType || "Flood"}
-                onChange={(e) =>
-                  setSelectedArea({ ...selectedArea, AreaType: e.target.value })
-                }
-                className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
-              >
-                <option value="Flood">Flood</option>
-                <option value="Earthquake">Earthquake</option>
-                <option value="Fire">Fire</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-yellow-500 mb-1">Severity Level:</label>
-              <select
-                value={selectedArea?.SeverityLevel || "Low"}
-                onChange={(e) =>
-                  setSelectedArea({ ...selectedArea, SeverityLevel: e.target.value })
-                }
-                className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block text-yellow-500 mb-1">Population:</label>
-              <input
-                type="number"
-                value={selectedArea?.Population || ""}
-                onChange={(e) =>
-                  setSelectedArea({ ...selectedArea, Population: e.target.value })
-                }
-                className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
-              />
-            </div>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => {
-                  setOpenEditModal(false);
-                  setOpenNewModal(false);
-                  setSelectedArea(null);
-                }}
-                className="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveArea}
-                className="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded"
-              >
-                Save
-              </button>
-            </div>
+            <form onSubmit={handleAreaSubmit}>
+              <div className="mb-4">
+                <label className="block text-yellow-500 mb-1">Area Name:</label>
+                <input
+                  type="text"
+                  value={selectedArea?.AreaName || ""}
+                  onChange={(e) =>
+                    setSelectedArea({ ...selectedArea, AreaName: e.target.value })
+                  }
+                  className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-yellow-500 mb-1">Area Type:</label>
+                <select
+                  value={selectedArea?.AreaType || "Flood"}
+                  onChange={(e) =>
+                    setSelectedArea({ ...selectedArea, AreaType: e.target.value })
+                  }
+                  className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
+                >
+                  <option value="Flood">Flood</option>
+                  <option value="Earthquake">Earthquake</option>
+                  <option value="Fire">Fire</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-yellow-500 mb-1">Severity Level:</label>
+                <select
+                  value={selectedArea?.SeverityLevel || "Low"}
+                  onChange={(e) =>
+                    setSelectedArea({ ...selectedArea, SeverityLevel: e.target.value })
+                  }
+                  className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-yellow-500 mb-1">Population:</label>
+                <input
+                  type="number"
+                  value={selectedArea?.Population || ""}
+                  onChange={(e) =>
+                    setSelectedArea({ ...selectedArea, Population: e.target.value })
+                  }
+                  className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenEditModal(false);
+                    setOpenNewModal(false);
+                    setSelectedArea(null);
+                  }}
+                  className="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

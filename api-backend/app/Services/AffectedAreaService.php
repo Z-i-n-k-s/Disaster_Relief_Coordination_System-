@@ -14,10 +14,10 @@ class AffectedAreaService
         return DB::select($sql);
     }
 
-    // Retrieve a single affected area by its ID
+    // Retrieve a single affected area by its AreaID
     public function getById($id)
     {
-        $sql = "SELECT * FROM affected_areas WHERE id = ?";
+        $sql = "SELECT * FROM affected_areas WHERE AreaID = ?";
         $result = DB::select($sql, [$id]);
         return count($result) ? $result[0] : null;
     }
@@ -39,9 +39,9 @@ class AffectedAreaService
             // Retrieve the last inserted ID
             $newId = DB::getPdo()->lastInsertId();
 
-            // Example subquery: fetch the affected area with the highest id for the given AreaType
+            // Example subquery: fetch the affected area with the highest AreaID for the given AreaType
             $subQuerySql = "SELECT * FROM affected_areas 
-                            WHERE id = (SELECT MAX(id) FROM affected_areas WHERE AreaType = ?)";
+                            WHERE AreaID = (SELECT MAX(AreaID) FROM affected_areas WHERE AreaType = ?)";
             $result = DB::select($subQuerySql, [$data['AreaType']]);
 
             DB::commit();
@@ -65,7 +65,7 @@ class AffectedAreaService
             }
             $bindings[] = $id;
             $setStr = implode(', ', $set);
-            $sql = "UPDATE affected_areas SET $setStr WHERE id = ?";
+            $sql = "UPDATE affected_areas SET $setStr WHERE AreaID = ?";
             $affected = DB::update($sql, $bindings);
             DB::commit();
             return $affected;
@@ -80,7 +80,7 @@ class AffectedAreaService
     {
         DB::beginTransaction();
         try {
-            $sql = "DELETE FROM affected_areas WHERE id = ?";
+            $sql = "DELETE FROM affected_areas WHERE AreaID = ?";
             $affected = DB::delete($sql, [$id]);
             DB::commit();
             return $affected;

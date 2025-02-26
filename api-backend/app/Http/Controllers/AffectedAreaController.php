@@ -30,11 +30,17 @@ class AffectedAreaController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->all();
+            $data  = $request->validate([
+                'AreaName'      => 'required|string|max:255',
+                'AreaType'      => 'required|string|max:255',
+                'SeverityLevel' => 'required|string|max:255',
+                'Population'    => 'required|integer',
+            ]);
             $area = $this->affectedAreaService->create($data);
             return response()->json($area, 201);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Error creating affected area'], 500);
+            //error_log($e);
+            return response()->json(['error' => 'Error creating affected area'],500);
         }
     }
 
