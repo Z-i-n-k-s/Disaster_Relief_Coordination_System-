@@ -117,15 +117,12 @@ CREATE TABLE aid_requests (
 CREATE TABLE aid_preparation (
     PreparationID INT AUTO_INCREMENT PRIMARY KEY,
     RequestID INT NOT NULL,
-    PreparedBy INT NOT NULL,
     DepartureTime DATETIME NOT NULL,
     EstimatedArrival DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_aid_preparation_request FOREIGN KEY (RequestID)
-         REFERENCES aid_requests(RequestID) ON DELETE CASCADE,
-    CONSTRAINT fk_aid_preparation_volunteer FOREIGN KEY (PreparedBy)
-         REFERENCES volunteers(VolunteerID) ON DELETE CASCADE
+         REFERENCES aid_requests(RequestID) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE aid_preparation_resources (
@@ -185,6 +182,9 @@ CREATE TABLE rescue_tracking_volunteers (
 ALTER TABLE resources
 ADD UNIQUE INDEX idx_resource_unique (ResourceType, ReliefCenterID);
 ALTER TABLE donations DROP COLUMN ResourceID;
+ALTER TABLE aid_preparation 
+ADD COLUMN Status ENUM('Pending','In Progress','Completed') NOT NULL; 
+
 
 -- Drop existing trigger
 DROP TRIGGER IF EXISTS trg_update_resource_after_donation;
