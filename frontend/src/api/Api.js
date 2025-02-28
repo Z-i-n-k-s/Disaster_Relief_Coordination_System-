@@ -178,15 +178,7 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
-  async getAllUsers() {
-    try {
-      const response = await this.client.get("api/users");
-      console.log("all users",response.data)
-      return response.data;
-    } catch (error) {
-      return error.response?.data || error.message;
-    }
-  }
+ 
   async getAllReliefCenters() {
     try {
       const response = await this.client.get("api/relief-centers");
@@ -230,6 +222,24 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
+  async getAllUsers() {
+    try {
+      const response = await this.client.get("api/users");
+      console.log("all users",response.data)
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async getAllVolunteers() {
+    try {
+      const response = await this.client.get("api/users/volunteers");
+      console.log("all volunteers",response.data)
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
   async updateUser(id, userData) {
     console.log("update data ",userData)
     try {
@@ -259,6 +269,7 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
+  
 
   async getUsersAidRequest(id) {
     try {
@@ -291,7 +302,38 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
-  
+  async createAidPrep(reqData) {
+    try {
+      console.log('new req ',reqData)
+      const response = await this.client.post("api/aid-preparation",reqData);
+      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async createAidPrepVolunteer(preparationId,VolunteerID) {
+    try {
+      console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.post(`api/aid-preparation/${preparationId}/volunteers`, {
+        VolunteerID: VolunteerID
+      });
+      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async getAidPrepVolunteer(preparationId) {
+    try {
+    //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.get(`api/aid-preparation/${preparationId}/volunteers`);
+      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
 }
 
 const apiClient = new ApiClient("http://127.0.0.1:8000");

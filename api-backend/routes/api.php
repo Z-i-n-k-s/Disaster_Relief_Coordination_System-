@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AffectedAreaController;
+use App\Http\Controllers\AidPrepController;
 use App\Http\Controllers\AidRequestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DonationController;
@@ -104,4 +105,31 @@ Route::prefix('affected-areas')->group(function () {
     Route::get('/{id}', [AffectedAreaController::class, 'show']);     // Retrieve a specific affected area
     Route::put('/{id}', [AffectedAreaController::class, 'update']);   // Update an existing affected area
     Route::delete('/{id}', [AffectedAreaController::class, 'destroy']); // Delete an affected area
+});
+
+
+/*
+|---------------------------------------------------------------------------
+| aid-prep Routes
+|---------------------------------------------------------------------------
+*/
+
+
+
+Route::prefix('aid-preparation')->group(function () {
+    // Aid Preparation endpoints
+    Route::post('/', [AidPrepController::class, 'create']);
+    Route::patch('/{preparationId}/times', [AidPrepController::class, 'updateTimes']);
+
+    // Volunteer endpoints
+    Route::post('/{preparationId}/volunteers', [AidPrepController::class, 'addVolunteer']);
+    Route::get('/{preparationId}/volunteers', [AidPrepController::class, 'getVolunteers']);
+    Route::patch('/volunteers/{volunteerRecordId}', [AidPrepController::class, 'updateVolunteer']);
+    Route::delete('/volunteers/{volunteerRecordId}', [AidPrepController::class, 'deleteVolunteer']);
+
+    // Resource Usage endpoints
+    Route::post('/{preparationId}/resources', [AidPrepController::class, 'addResource']);
+    Route::get('/{preparationId}/resources', [AidPrepController::class, 'getResources']);
+    Route::patch('/resources/{usageRecordId}', [AidPrepController::class, 'updateResource']);
+    Route::delete('/resources/{usageRecordId}', [AidPrepController::class, 'deleteResource']);
 });
