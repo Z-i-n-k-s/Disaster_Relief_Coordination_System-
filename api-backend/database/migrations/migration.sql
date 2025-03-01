@@ -184,7 +184,9 @@ ADD UNIQUE INDEX idx_resource_unique (ResourceType, ReliefCenterID);
 ALTER TABLE donations DROP COLUMN ResourceID;
 ALTER TABLE aid_preparation 
 ADD COLUMN Status ENUM('Pending','In Progress','Completed') NOT NULL; 
-
+ALTER TABLE rescue_tracking
+DROP COLUMN CurrentLocation,
+DROP COLUMN SuppliesDelivered;
 
 -- Drop existing trigger
 DROP TRIGGER IF EXISTS trg_update_resource_after_donation;

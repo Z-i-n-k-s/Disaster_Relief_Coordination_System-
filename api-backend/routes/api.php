@@ -8,6 +8,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ReliefCenterController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VolunteerTaskController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -114,12 +115,13 @@ Route::prefix('affected-areas')->group(function () {
 |---------------------------------------------------------------------------
 */
 
-
-
 Route::prefix('aid-preparation')->group(function () {
     // Aid Preparation endpoints
     Route::post('/', [AidPrepController::class, 'create']);
     Route::patch('/{preparationId}/times', [AidPrepController::class, 'updateTimes']);
+
+
+    Route::patch('/{preparationId}/status', [AidPrepController::class, 'updateStatus']);
 
     // Volunteer endpoints
     Route::post('/{preparationId}/volunteers', [AidPrepController::class, 'addVolunteer']);
@@ -133,3 +135,11 @@ Route::prefix('aid-preparation')->group(function () {
     Route::patch('/resources/{usageRecordId}', [AidPrepController::class, 'updateResource']);
     Route::delete('/resources/{usageRecordId}', [AidPrepController::class, 'deleteResource']);
 });
+
+/*
+|---------------------------------------------------------------------------
+| volunteer tasks Routes
+|---------------------------------------------------------------------------
+*/
+Route::get('/volunteers/{volunteerId}/aid-prep-tasks', [VolunteerTaskController::class, 'getAidPrepTasks']);
+Route::get('/volunteers/{volunteerId}/rescue-tracking-tasks', [VolunteerTaskController::class, 'getRescueTrackingTasks']);

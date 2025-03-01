@@ -128,7 +128,7 @@ class AidPrepService
         $resourceUsage = DB::select('SELECT * FROM aid_preparation_resources WHERE ID = ? LIMIT 1', [$id]);
         return $resourceUsage[0];
     }
-
+    
     public function getResourceUsages($preparationId)
     {
         return DB::select('SELECT * FROM aid_preparation_resources WHERE PreparationID = ?', [$preparationId]);
@@ -153,5 +153,13 @@ class AidPrepService
             throw new Exception('Resource usage record not found.');
         }
         return true;
+    }
+
+    public function updateAidPrepStatus($preparationId, $status)
+    {
+        DB::update(
+            'UPDATE aid_preparation SET Status = ?, updated_at = NOW() WHERE PreparationID = ?',
+            [$status, $preparationId]
+        );
     }
 }

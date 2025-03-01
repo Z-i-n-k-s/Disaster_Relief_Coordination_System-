@@ -193,4 +193,18 @@ class AidPrepController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
+
+    public function updateStatus(Request $request, $preparationId)
+    {
+        $request->validate([
+            'Status' => 'required|string'
+        ]);
+        
+        try {
+            $this->aidPrepService->updateAidPrepStatus($preparationId, $request->input('Status'));
+            return response()->json(['success' => true, 'message' => 'Status updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
 }

@@ -80,7 +80,7 @@ const SignUp = () => {
           case "Volunteer":
             toast.success(`Welcome to volunteer panel`);
             setTimeout(() => {
-              navigate("/");
+              navigate("/volunteer-panel/assigned-tasks");
             }, 1000);
             break;
           case "User":

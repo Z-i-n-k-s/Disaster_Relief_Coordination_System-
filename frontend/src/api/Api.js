@@ -269,6 +269,17 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
+  async createAidResource(reqData,preparationId) {
+    try {
+      console.log('new req ',reqData)
+      const response = await this.client.post(`api/aid-preparation/${preparationId}/resources`,reqData);
+      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+
   
 
   async getUsersAidRequest(id) {
@@ -324,11 +335,41 @@ class ApiClient {
       return error.response?.data || error.message;
     }
   }
+  async getAidResource(preparationId) {
+    try {
+     // console.log('new req ',reqData)
+      const response = await this.client.get(`api/aid-preparation/${preparationId}/resources`);
+      
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
   async getAidPrepVolunteer(preparationId) {
     try {
     //  console.log('prep vol req ',preparationId,VolunteerID)
       const response = await this.client.get(`api/aid-preparation/${preparationId}/volunteers`);
       
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async getVolunteersAidPrepTasks(volunteerId) {
+    try {
+    //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.get(`api/volunteers/${volunteerId}/aid-prep-tasks`);
+     // console.log(response)
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async updateAidPrepStatus(preparationId,reqData) {
+    try {
+    //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.patch(`api/aid-preparation/${preparationId}/status`,reqData);
+     // console.log(response)
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
