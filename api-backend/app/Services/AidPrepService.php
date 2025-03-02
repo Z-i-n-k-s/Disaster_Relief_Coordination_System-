@@ -93,7 +93,43 @@ class AidPrepService
                 )';
         return DB::select($sql, [$requestId]);
     }
+
+    public function getAidPrepStatus($requestId)
+    {
+        $sql = 'SELECT Status FROM aid_preparation WHERE RequestID = ?';
+        $result = DB::select($sql, [$requestId]);
     
+        if (empty($result)) {
+            throw new \Exception('ID not Valid');
+        }
+    
+        return $result[0]->Status;
+    }
+    
+
+
+
+public function getFullAidPrepDetails()
+{
+    // Retrieve all records from the AidPreparation table.
+    $aidPreps = DB::select('SELECT * FROM aid_preparation');
+
+    if (empty($aidPreps)) {
+        throw new \Exception("No aid preparation records found.");
+    }
+
+    // Loop through each aid preparation record.
+    foreach ($aidPreps as $prep) {
+        // Fetch the aid request info using the RequestID from the aid preparation record.
+        $requestInfo = DB::select('SELECT * FROM aid_requests WHERE RequestID = ? LIMIT 1', [$prep->RequestID]);
+        $prep->requestInfo = !empty($requestInfo) ? $requestInfo[0] : null;
+
+    }
+
+    return $aidPreps;
+}
+
+
 
     public function updateVolunteer($volunteerRecordId, $volunteerId)
     {

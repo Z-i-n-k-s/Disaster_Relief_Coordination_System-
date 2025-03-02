@@ -127,6 +127,26 @@ public function updateStatus($id, $status)
         throw $e;
     }
 }
+public function updateResponseTime($id, $responseTime)
+{
+    // Validate that the responseTime is in the correct format
+    $date = \DateTime::createFromFormat('Y-m-d H:i:s', $responseTime);
+    if (!$date || $date->format('Y-m-d H:i:s') !== $responseTime) {
+        throw new Exception("Invalid date time format: $responseTime. Expected format: Y-m-d H:i:s");
+    }
+
+    DB::beginTransaction();
+    try {
+        $sql = "UPDATE aid_requests SET ResponseTime = ? WHERE RequestID = ?";
+        $affected = DB::update($sql, [$responseTime, $id]);
+        DB::commit();
+        return $affected;
+    } catch(Exception $e) {
+        DB::rollBack();
+        throw $e;
+    }
+}
+
 
     
 }

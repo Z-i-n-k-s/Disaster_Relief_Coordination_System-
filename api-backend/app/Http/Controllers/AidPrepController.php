@@ -32,6 +32,16 @@ class AidPrepController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
+    public function getAllAidPrepDetails()
+{
+    try {
+        $details = $this->aidPrepService->getFullAidPrepDetails();
+        return response()->json(['success' => true, 'data' => $details]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+    }
+}
+
     
     /**
      * Update DepartureTime and EstimatedArrival for a given aid preparation.
@@ -86,6 +96,15 @@ class AidPrepController extends Controller
     {
         try {
             $volunteers = $this->aidPrepService->getVolunteers($requestId);
+            return response()->json(['success' => true, 'data' => $volunteers]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+    public function getAidPrepStatus($requestId)
+    {
+        try {
+            $volunteers = $this->aidPrepService->getAidPrepStatus($requestId);
             return response()->json(['success' => true, 'data' => $volunteers]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);

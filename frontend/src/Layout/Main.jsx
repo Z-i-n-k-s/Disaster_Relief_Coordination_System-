@@ -57,7 +57,7 @@ const Main = () => {
           break;
         case "Volunteer":
           allowedPrefix = "/volunteer-panel";
-          defaultRedirect = "/volunteer-panel"; // Adjust if needed
+          defaultRedirect = "/volunteer-panel/assigned-tasks"; // Adjust if needed
           break;
         case "User":
           allowedPrefix = "/user-panel";

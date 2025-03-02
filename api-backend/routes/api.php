@@ -6,6 +6,8 @@ use App\Http\Controllers\AidRequestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ReliefCenterController;
+use App\Http\Controllers\RescueTrackingController;
+use App\Http\Controllers\RescueTrackingVolunteerController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VolunteerTaskController;
@@ -86,6 +88,7 @@ Route::prefix('users')->middleware(AuthMiddleware::class)->group(function () {
 Route::prefix('aid-requests')->group(function () {
     Route::get('/user/{userId}', [AidRequestController::class, 'getUserRequests']);
     Route::patch('/{id}/status', [AidRequestController::class, 'updateStatus']);
+    Route::patch('/{id}/response-time', [AidRequestController::class, 'updateResponseTime']);
 
     Route::get('/', [AidRequestController::class, 'index']);      // List all aid requests
     Route::post('/', [AidRequestController::class, 'store']);     // Create a new aid request
@@ -119,6 +122,8 @@ Route::prefix('aid-preparation')->group(function () {
     // Aid Preparation endpoints
     Route::post('/', [AidPrepController::class, 'create']);
     Route::patch('/{preparationId}/times', [AidPrepController::class, 'updateTimes']);
+    Route::get('/full-details', [AidPrepController::class, 'getAllAidPrepDetails']);
+
 
 
     Route::patch('/{preparationId}/status', [AidPrepController::class, 'updateStatus']);
@@ -126,6 +131,7 @@ Route::prefix('aid-preparation')->group(function () {
     // Volunteer endpoints
     Route::post('/{preparationId}/volunteers', [AidPrepController::class, 'addVolunteer']);
     Route::get('/{preparationId}/volunteers', [AidPrepController::class, 'getVolunteers']);
+    Route::get('/{preparationId}/status', [AidPrepController::class, 'getAidPrepStatus']);
     Route::patch('/volunteers/{volunteerRecordId}', [AidPrepController::class, 'updateVolunteer']);
     Route::delete('/volunteers/{volunteerRecordId}', [AidPrepController::class, 'deleteVolunteer']);
 
@@ -143,3 +149,14 @@ Route::prefix('aid-preparation')->group(function () {
 */
 Route::get('/volunteers/{volunteerId}/aid-prep-tasks', [VolunteerTaskController::class, 'getAidPrepTasks']);
 Route::get('/volunteers/{volunteerId}/rescue-tracking-tasks', [VolunteerTaskController::class, 'getRescueTrackingTasks']);
+
+
+
+// Rescue Tracking endpoints
+Route::post('/rescue-tracking', [RescueTrackingController::class, 'store']);
+Route::patch('/rescue-tracking/{id}', [RescueTrackingController::class, 'update']);
+Route::get('/rescue-tracking/{id}', [RescueTrackingController::class, 'show']);
+
+// Rescue Tracking Volunteers endpoints (only create and read)
+Route::get('/rescue-tracking-volunteers', [RescueTrackingVolunteerController::class, 'index']);
+Route::post('/rescue-tracking-volunteers', [RescueTrackingVolunteerController::class, 'store']);

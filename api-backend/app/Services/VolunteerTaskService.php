@@ -48,17 +48,33 @@ class VolunteerTaskService
         $sql = "
             SELECT 
                 rt.TrackingID AS task_id, 
+                rt.RequestID AS req_id,
                 rt.TrackingStatus AS status, 
-                rt.CurrentLocation AS current_location, 
                 rt.OperationStartTime AS operation_start_time, 
                 rt.CompletionTime AS completion_time, 
-                rt.created_at AS created_at
+                rt.NumberOfPeopleHelped AS number_of_people_helped,
+                ar.RequestID,
+                ar.RequesterName,
+                ar.ContactInfo,
+                ar.RequestType,
+                ar.Description,
+                ar.UrgencyLevel,
+                ar.Status AS request_status,
+                ar.NumberOfPeople,
+                ar.RequestDate,
+                ar.ResponseTime,
+                aa.AreaName AS area_name
             FROM rescue_tracking_volunteers AS rtv
             JOIN rescue_tracking AS rt 
               ON rtv.TrackingID = rt.TrackingID
+            JOIN aid_requests AS ar
+              ON rt.RequestID = ar.RequestID
+            JOIN affected_areas AS aa
+              ON ar.AreaID = aa.AreaID
             WHERE rtv.VolunteerID = ?
         ";
-
+    
         return DB::select($sql, [$volunteerId]);
     }
+    
 }

@@ -115,5 +115,26 @@ class AidRequestController extends Controller
             ], 500);
         }
     }
+    public function updateResponseTime(Request $request, $id)
+{
+    // Change to 'date' to match the frontend payload.
+    $responseTime = $request->input('date'); 
+    error_log('time is ' . $responseTime);
+
+    try {
+        $affected = $this->aidRequestService->updateResponseTime($id, $responseTime);
+        return response()->json([
+            'success'  => true,
+            'affected' => $affected,
+            'message'  => 'Response time updated successfully.'
+        ]);
+    } catch(Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error'   => $e->getMessage()
+        ], 500);
+    }
+}
+
     
 }

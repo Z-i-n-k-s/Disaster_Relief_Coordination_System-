@@ -3,7 +3,7 @@ import axios from "axios";
 class ApiClient {
   constructor(baseURL) {
     this.baseURL = baseURL;
-    
+
     // Main axios client with interceptors
     this.client = axios.create({
       baseURL,
@@ -109,11 +109,9 @@ class ApiClient {
 
   async login(credentials) {
     try {
-      console.log(credentials)
+      console.log(credentials);
       const response = await this.client.post("api/login", credentials);
       console.log("res from login", response);
-
-     
 
       return response.data;
     } catch (error) {
@@ -124,16 +122,16 @@ class ApiClient {
   async logout() {
     try {
       const response = await this.client.post("api/logout");
-      console.log("response logout",response.data)
+      console.log("response logout", response.data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
-    } 
+    }
   }
 
   async submitDonation(donationData) {
     try {
-      console.log("donation data ",donationData)
+      console.log("donation data ", donationData);
       const response = await this.client.post("api/donations", donationData);
       return response.data;
     } catch (error) {
@@ -149,10 +147,13 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
-  async  createReliefCenter(reliefCenterData) {
+  async createReliefCenter(reliefCenterData) {
     try {
-      console.log('add relife data',reliefCenterData)
-      const response = await this.client.post("api/relief-centers/", reliefCenterData, );
+      console.log("add relife data", reliefCenterData);
+      const response = await this.client.post(
+        "api/relief-centers/",
+        reliefCenterData
+      );
       return response.data;
     } catch (error) {
       // Handle errors (e.g., validation errors from the backend)
@@ -163,7 +164,7 @@ class ApiClient {
   async getUser() {
     try {
       const response = await this.client.get("api/users/currentUser");
-      
+
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -172,17 +173,17 @@ class ApiClient {
   async getUsersDonations() {
     try {
       const response = await this.client.get("api/donations/history");
-      
+
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
     }
   }
- 
+
   async getAllReliefCenters() {
     try {
       const response = await this.client.get("api/relief-centers");
-      console.log("all users",response.data)
+      console.log("all users", response.data);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -190,9 +191,9 @@ class ApiClient {
   }
   async createAffectedArea(areaData) {
     try {
-      console.log('new area ',areaData)
-      const response = await this.client.post("api/affected-areas",areaData);
-      
+      console.log("new area ", areaData);
+      const response = await this.client.post("api/affected-areas", areaData);
+
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -200,7 +201,7 @@ class ApiClient {
   }
   async getAffectedArea() {
     try {
-      const response = await this.client.get("api/affected-areas");      
+      const response = await this.client.get("api/affected-areas");
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -208,7 +209,10 @@ class ApiClient {
   }
   async updateAffectedArea(id, areaData) {
     try {
-      const response = await this.client.put(`api/affected-areas/${id}`,areaData);      
+      const response = await this.client.put(
+        `api/affected-areas/${id}`,
+        areaData
+      );
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -216,7 +220,7 @@ class ApiClient {
   }
   async deleteAffectedArea(id) {
     try {
-      const response = await this.client.delete(`api/affected-areas/${id}`);      
+      const response = await this.client.delete(`api/affected-areas/${id}`);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -225,7 +229,7 @@ class ApiClient {
   async getAllUsers() {
     try {
       const response = await this.client.get("api/users");
-      console.log("all users",response.data)
+      console.log("all users", response.data);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -234,14 +238,14 @@ class ApiClient {
   async getAllVolunteers() {
     try {
       const response = await this.client.get("api/users/volunteers");
-      console.log("all volunteers",response.data)
+      console.log("all volunteers", response.data);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
     }
   }
   async updateUser(id, userData) {
-    console.log("update data ",userData)
+    console.log("update data ", userData);
     try {
       const response = await this.client.put(`api/users/${id}`, userData);
       return response.data;
@@ -249,7 +253,7 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
-  
+
   async deleteUser(id) {
     try {
       const response = await this.client.delete(`api/users/${id}`);
@@ -258,35 +262,36 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
-  
+
   async createAidRequest(reqData) {
     try {
-      console.log('new req ',reqData)
-      const response = await this.client.post("api/aid-requests",reqData);
-      
-      return response.data;
-    } catch (error) {
-      return error.response?.data || error.message;
-    }
-  }
-  async createAidResource(reqData,preparationId) {
-    try {
-      console.log('new req ',reqData)
-      const response = await this.client.post(`api/aid-preparation/${preparationId}/resources`,reqData);
-      
-      return response.data;
-    } catch (error) {
-      return error.response?.data || error.message;
-    }
-  }
+      console.log("new req ", reqData);
+      const response = await this.client.post("api/aid-requests", reqData);
 
-  
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async createAidResource(reqData, preparationId) {
+    try {
+      console.log("new req ", reqData);
+      const response = await this.client.post(
+        `api/aid-preparation/${preparationId}/resources`,
+        reqData
+      );
+
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
 
   async getUsersAidRequest(id) {
     try {
-    //  console.log('new req ',reqData)
+      //  console.log('new req ',reqData)
       const response = await this.client.get(`api/aid-requests/user/${id}`);
-    //  console.log(response);
+      //  console.log(response);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -294,9 +299,9 @@ class ApiClient {
   }
   async getAllAidRequest() {
     try {
-    //  console.log('new req ',reqData)
+      //  console.log('new req ',reqData)
       const response = await this.client.get(`api/aid-requests`);
-     // console.log(response);
+      // console.log(response);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -304,32 +309,53 @@ class ApiClient {
   }
   async updateAidRequestStatus(id, status) {
     try {
-      console.log('new req ', id, status);
+      console.log("new req ", id, status);
       // Send the status as an object { status: "value" }
-      const response = await this.client.patch(`api/aid-requests/${id}/status`, { status });
+      const response = await this.client.patch(
+        `api/aid-requests/${id}/status`,
+        { status }
+      );
       console.log(response);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
     }
   }
-  async createAidPrep(reqData) {
+  async updateAidRequestResponseTime(id, date) {
     try {
-      console.log('new req ',reqData)
-      const response = await this.client.post("api/aid-preparation",reqData);
-      
+      console.log("new req ", id, date);
+      // Pass the date as an object { date: "YYYY-MM-DD HH:mm:ss" }
+      const response = await this.client.patch(
+        `api/aid-requests/${id}/response-time`,
+        { date }
+      );
+      console.log(response);
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
     }
   }
-  async createAidPrepVolunteer(preparationId,VolunteerID) {
+  
+  async createAidPrep(reqData) {
     try {
-      console.log('prep vol req ',preparationId,VolunteerID)
-      const response = await this.client.post(`api/aid-preparation/${preparationId}/volunteers`, {
-        VolunteerID: VolunteerID
-      });
-      
+      console.log("new req ", reqData);
+      const response = await this.client.post("api/aid-preparation", reqData);
+
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async createAidPrepVolunteer(preparationId, VolunteerID) {
+    try {
+      console.log("prep vol req ", preparationId, VolunteerID);
+      const response = await this.client.post(
+        `api/aid-preparation/${preparationId}/volunteers`,
+        {
+          VolunteerID: VolunteerID,
+        }
+      );
+
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -337,9 +363,11 @@ class ApiClient {
   }
   async getAidResource(preparationId) {
     try {
-     // console.log('new req ',reqData)
-      const response = await this.client.get(`api/aid-preparation/${preparationId}/resources`);
-      
+      // console.log('new req ',reqData)
+      const response = await this.client.get(
+        `api/aid-preparation/${preparationId}/resources`
+      );
+
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
@@ -347,32 +375,155 @@ class ApiClient {
   }
   async getAidPrepVolunteer(preparationId) {
     try {
-    //  console.log('prep vol req ',preparationId,VolunteerID)
-      const response = await this.client.get(`api/aid-preparation/${preparationId}/volunteers`);
-      
+      //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.get(
+        `api/aid-preparation/${preparationId}/volunteers`
+      );
+
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
     }
   }
+  async getAidPrepStatus(preparationId) {
+    try {
+      //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.get(
+        `api/aid-preparation/${preparationId}/status`
+      );
+
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  async getAidPrepDetails() {
+    try {
+      //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.get(
+        `api/aid-preparation/full-details`
+      );
+
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+  // Update times for a specific Aid Preparation entry by preparationId
+  async updateAidPrepTimes(preparationId, timesData) {
+    try {
+      const response = await this.client.patch(
+        `api/aid-preparation/${preparationId}/times`,
+        timesData
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
   async getVolunteersAidPrepTasks(volunteerId) {
     try {
-    //  console.log('prep vol req ',preparationId,VolunteerID)
-      const response = await this.client.get(`api/volunteers/${volunteerId}/aid-prep-tasks`);
-     // console.log(response)
+      //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.get(
+        `api/volunteers/${volunteerId}/aid-prep-tasks`
+      );
+      // console.log(response)
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
     }
   }
-  async updateAidPrepStatus(preparationId,reqData) {
+  async getVolunteersResTasks(volunteerId) {
     try {
-    //  console.log('prep vol req ',preparationId,VolunteerID)
-      const response = await this.client.patch(`api/aid-preparation/${preparationId}/status`,reqData);
-     // console.log(response)
+      //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.get(
+        `api/volunteers/${volunteerId}/rescue-tracking-tasks`
+      );
+      // console.log(response)
       return response.data;
     } catch (error) {
       return error.response?.data || error.message;
+    }
+  }
+  async updateAidPrepStatus(preparationId, reqData) {
+    try {
+      //  console.log('prep vol req ',preparationId,VolunteerID)
+      const response = await this.client.patch(
+        `api/aid-preparation/${preparationId}/status`,
+        reqData
+      );
+      // console.log(response)
+      return response.data;
+    } catch (error) {
+      return error.response?.data || error.message;
+    }
+  }
+
+  // Create a new Rescue Tracking entry
+  async createRescueTracking(rescueData) {
+    try {
+      const response = await this.client.post(
+        "api/rescue-tracking",
+        rescueData
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+  // Update an existing Rescue Tracking entry by ID
+  async updateRescueTracking(id, updateData) {
+    try {
+      const response = await this.client.patch(
+        `api/rescue-tracking/${id}`,
+        updateData
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+  // Get details of a Rescue Tracking entry by ID
+  async getRescueTracking(id) {
+    try {
+      const response = await this.client.get(`api/rescue-tracking/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+  async updateRescueTracking(id,updateData) {
+    try {
+      const response = await this.client.patch(`api/rescue-tracking/${id}`,updateData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+  // Get all Rescue Tracking Volunteers
+  async getRescueTrackingVolunteers() {
+    try {
+      const response = await this.client.get("api/rescue-tracking-volunteers");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+  // Create a new Rescue Tracking Volunteer entry
+  async createRescueTrackingVolunteer(volunteerData) {
+    try {
+      const response = await this.client.post(
+        "api/rescue-tracking-volunteers",
+        volunteerData
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
     }
   }
 }

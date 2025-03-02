@@ -4,6 +4,7 @@ import { FaClipboardList, FaHandsHelping, FaChartBar, FaBars } from "react-icons
 import { FaRightFromBracket, FaUserLarge } from "react-icons/fa6";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
+import { MdTrackChanges } from "react-icons/md";
 
 const VolunteerSideBar = ({ isOpen, setIsOpen, volunteer }) => {
   return (
@@ -38,8 +39,7 @@ const VolunteerSideBar = ({ isOpen, setIsOpen, volunteer }) => {
       <nav className="flex flex-col gap-4 p-4">
         {[
           { to: "/volunteer-panel/assigned-tasks", icon: <FaClipboardList />, label: "Assigned Tasks" },
-          { to: "/volunteer-panel/aids-prepared", icon: <FaHandsHelping />, label: "Aids Prepared" },
-          { to: "/volunteer-panel/all-participations", icon: <FaChartBar />, label: "All Participations" },
+          { to: "/volunteer-panel/tracking-tasks", icon: <MdTrackChanges />, label: "Rescue Tracking Tasks" },
           { to: "/volunteer-panel/vol-logout", icon: <FaRightFromBracket />, label: "Logout" },
         ].map(({ to, icon, label }) => (
           <NavLink

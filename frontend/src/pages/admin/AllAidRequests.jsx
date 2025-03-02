@@ -11,6 +11,8 @@ const URGENCY_OPTIONS = ["all", "Low", "Medium", "High"];
 
 const AllAidRequests = () => {
   const user = useSelector((state) => state?.user?.user);
+  const [aidPrepStatuses, setAidPrepStatuses] = useState({});
+
   const [aidRequests, setAidRequests] = useState([]);
   const [showLoader, setShowLoader] = useState(false);
 
@@ -38,6 +40,28 @@ const AllAidRequests = () => {
       const dataResponse = await apiClient.getAllAidRequest();
       if (dataResponse) {
         setAidRequests(dataResponse);
+
+        // Get status for each aid request concurrently
+        const aidStatuses = await Promise.all(
+          dataResponse.map(async (request) => {
+            const res = await apiClient.getAidPrepStatus(request.RequestID);
+            // Assuming the status is available in res.data (or res.data.status if nested)
+            return {
+              requestId: request.RequestID,
+              status: res.data,
+            };
+          })
+        );
+
+        // Create a mapping of requestId to status for quick lookup
+        const statusMapping = aidStatuses.reduce((acc, curr) => {
+          acc[curr.requestId] = curr.status;
+          return acc;
+        }, {});
+
+        setAidPrepStatuses(statusMapping);
+        console.log("status with req id", aidStatuses);
+        setShowLoader(false);
       } else {
         toast.error(dataResponse?.message || "No data received.");
       }
@@ -45,7 +69,7 @@ const AllAidRequests = () => {
       toast.error("Error fetching aid requests");
       console.error("Error:", error);
     } finally {
-      setShowLoader(false);
+      
     }
   }, [user]);
 
@@ -117,6 +141,7 @@ const AllAidRequests = () => {
       try {
         // Call the API method with the specific RequestID
         const dataResponse = await apiClient.getAidPrepVolunteer(requestId);
+
         if (dataResponse && dataResponse.success) {
           setPrepVolunteers(dataResponse.data);
         } else {
@@ -135,7 +160,7 @@ const AllAidRequests = () => {
   // Fetch all volunteers (complete list)
   const fetchAllVolunteers = useCallback(async () => {
     if (!user?.UserID) return;
-    setShowLoader(true);
+    
     try {
       const dataResponse = await apiClient.getAllVolunteers();
       if (dataResponse && dataResponse.success) {
@@ -147,14 +172,14 @@ const AllAidRequests = () => {
       toast.error("Error fetching volunteers");
       console.error("Error:", error);
     } finally {
-      setShowLoader(false);
+      
     }
   }, [user]);
 
   useEffect(() => {
     fetchAllAidRequest();
     fetchAllVolunteers();
-  }, [fetchAllAidRequest, fetchAllVolunteers]);
+  }, [fetchAllAidRequest]);
 
   // Handle inline status update (now used only to update to "In Progress")
   const handleStatusUpdate = async (requestId, newStatus) => {
@@ -362,12 +387,21 @@ const AllAidRequests = () => {
                     {request.Status}
                   </td>
                   <td className="px-4 py-2 text-center border-b border-gray-600">
-                    <button
-                      onClick={() => handleShowVolunteers(request)}
-                      className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded"
-                    >
-                      Ask Volunteers
-                    </button>
+                    {aidPrepStatuses[request.RequestID] === "Completed" ? (
+                      <button
+                        disabled
+                        className="bg-gray-600 text-white px-3 py-1 rounded cursor-not-allowed"
+                      >
+                        Preparation completed
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleShowVolunteers(request)}
+                        className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded"
+                      >
+                        Ask Volunteers
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))
@@ -428,8 +462,7 @@ const AllAidRequests = () => {
                   // Compare IDs as numbers for proper matching
                   const isAsked = prepVolunteers.some(
                     (item) =>
-                      Number(item.VolunteerID) ===
-                      Number(volunteer.VolunteerID)
+                      Number(item.VolunteerID) === Number(volunteer.VolunteerID)
                   );
                   return (
                     <div
