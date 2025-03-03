@@ -6,7 +6,8 @@ import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 import { MdTrackChanges } from "react-icons/md";
 
-const VolunteerSideBar = ({ isOpen, setIsOpen, volunteer }) => {
+const VolunteerSideBar = ({ isOpen, setIsOpen, user }) => {
+  console.log(user)
   return (
     <div
       className={`bg-black customShadow min-h-screen transition-all duration-300 ${
@@ -21,9 +22,9 @@ const VolunteerSideBar = ({ isOpen, setIsOpen, volunteer }) => {
         {isOpen && (
           <>
             <p className="capitalize text-lg font-bold text-white mt-2">
-              {volunteer?.Name}
+              {user?.Name}
             </p>
-            <p className="text-sm text-white">{volunteer?.Role}</p>
+            <p className="text-sm text-white">{user?.Role}</p>
           </>
         )}
       </div>

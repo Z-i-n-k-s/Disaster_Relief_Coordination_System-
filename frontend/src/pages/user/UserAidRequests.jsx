@@ -88,25 +88,24 @@ const UserAidRequests = () => {
   }, [fetchUsersAidRequest]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <h1 className="text-3xl font-bold mb-4 text-yellow-500">User Aid Requests</h1>
-      <div className="bg-gray-800 rounded overflow-x-auto">
+    <div className="min-h-screen bg-black text-white p-4">
+      <h1 className="text-3xl font-bold mb-4 text-yellow-500 text-center m-5 pb-10">User Aid Requests</h1>
+      <div className="bg-black rounded overflow-x-auto border border-white">
         <table className="min-w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-700 text-white">
-              <th className="px-4 py-2 text-center">Sr.</th>
-              <th className="px-4 py-2 text-left">Requester Name</th>
-              <th className="px-4 py-2 text-left">Contact Info</th>
-              <th className="px-4 py-2 text-left">Request Type</th>
-              <th className="px-4 py-2 text-left">Description</th>
-              <th className="px-4 py-2 text-center">Urgency Level</th>
-              {/* Combined Status and Action column */}
-              <th className="px-4 py-2 text-center">Status</th>
+            <tr className="bg-black text-white border-b border-white">
+              <th className="px-4 py-2 border border-white text-center">Sr.</th>
+              <th className="px-4 py-2 border border-white text-left">Requester Name</th>
+              <th className="px-4 py-2 border border-white text-left">Contact Info</th>
+              <th className="px-4 py-2 border border-white text-left">Request Type</th>
+              <th className="px-4 py-2 border border-white text-left">Description</th>
+              <th className="px-4 py-2 border border-white text-center">Urgency Level</th>
+              <th className="px-4 py-2 border border-white text-center">Status</th>
             </tr>
           </thead>
           <tbody>
             {showLoader ? (
-              <tr>
+              <tr className="group transition transform duration-200 text-gray-400 group-hover:text-white">
                 <td colSpan="7" className="p-4">
                   <div className="flex justify-center items-center">
                     <ThreeDots color="#7542ff" height={80} width={80} />
@@ -115,36 +114,51 @@ const UserAidRequests = () => {
               </tr>
             ) : aidRequests.length > 0 ? (
               aidRequests.map((request, index) => (
-                <tr key={request.RequestID} className="hover:bg-gray-700">
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                <tr
+                  key={request.RequestID}
+                  className="group transition transform duration-200 hover:-translate-y-1 hover:shadow-md text-gray-400 group-hover:text-white"
+                >
+                  <td className="px-4 py-2 text-center border border-white">
                     {index + 1}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600 whitespace-nowrap">
+                  <td className="px-4 py-2 text-left border border-white whitespace-nowrap">
                     {request.RequesterName}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600 whitespace-nowrap">
+                  <td className="px-4 py-2 text-left border border-white whitespace-nowrap">
                     {request.ContactInfo}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600 whitespace-nowrap">
+                  <td className="px-4 py-2 text-left border border-white whitespace-nowrap">
                     {request.RequestType}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600 break-words">
+                  <td className="px-4 py-2 text-left border border-white break-words">
                     {request.Description}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600 whitespace-nowrap">
+                  <td className="px-4 py-2 text-center border border-white whitespace-nowrap">
                     {request.UrgencyLevel}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600 whitespace-normal break-words">
+                  <td className="px-4 py-2 text-center border border-white whitespace-normal break-words">
                     {request.ResponseTime ? (
-                      <div>{`Help was provided to user at: ${request.ResponseTime}`}</div>
+                      <div className="text-green-500 group-hover:text-white">
+                        {`Help was provided at: ${request.ResponseTime}`}
+                      </div>
                     ) : (
-                      <div>{request.Status}</div>
+                      <div
+                        className={`${
+                          request.Status === 'Pending'
+                            ? 'text-yellow-400'
+                            : request.Status === 'Completed'
+                            ? 'text-green-500'
+                            : 'text-red-500'
+                        } group-hover:text-white`}
+                      >
+                        {request.Status}
+                      </div>
                     )}
                     {(!request.ResponseTime && request.Status === 'Completed') && (
                       <div className="mt-2">
                         <button
                           onClick={() => updateUsersAidResponseTime(request.RequestID)}
-                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded transition duration-200"
                         >
                           Let us know you received help
                         </button>
@@ -154,7 +168,7 @@ const UserAidRequests = () => {
                 </tr>
               ))
             ) : (
-              <tr>
+              <tr className="group transition transform duration-200 text-gray-400 group-hover:text-white">
                 <td colSpan="7" className="p-4 text-center">
                   No aid requests found.
                 </td>
@@ -165,6 +179,10 @@ const UserAidRequests = () => {
       </div>
     </div>
   );
+  
+  
+  
+  
 };
 
 export default UserAidRequests;

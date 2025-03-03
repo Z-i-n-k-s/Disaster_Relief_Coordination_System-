@@ -87,22 +87,25 @@ const UserDonations = () => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
-
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
+    <div className="min-h-screen bg-black text-white p-4">
+       <div>
+        <h1 className="text-4xl font-bold text-yellow-600 mt-5 pb-10">All Donations</h1>
+      </div>
       {/* Filters, Sorting, and Search Controls */}
-      <div className="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
-        <div className="flex flex-col md:flex-row md:gap-4">
+      <div className="mb-4 space-y-4">
+        {/* First Row: Filter and Search */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           {/* Filter by Donation Type */}
-          <div className="mb-2 md:mb-0">
-            <label htmlFor="donationTypeFilter" className="mr-2 text-lg font-semibold text-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <label htmlFor="donationTypeFilter" className="text-lg font-semibold text-white">
               Filter by Donation Type:
             </label>
             <select
               id="donationTypeFilter"
               value={filterDonationType}
               onChange={handleDonationTypeChange}
-              className="bg-gray-800 text-white border border-gray-600 p-2 rounded-md shadow-lg hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="bg-black text-white border border-white p-2 rounded-md shadow-lg hover:border-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="all">All</option>
               <option value="Food">Food</option>
@@ -112,8 +115,8 @@ const UserDonations = () => {
             </select>
           </div>
           {/* Search by Date Received */}
-          <div className="mb-2 md:mb-0 flex items-center">
-            <label htmlFor="search" className="mr-2 text-lg font-semibold text-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <label htmlFor="search" className="text-lg font-semibold text-white">
               Search by Date (YYYY-MM-DD):
             </label>
             <div className="relative">
@@ -122,12 +125,12 @@ const UserDonations = () => {
                 type="text"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-gray-800 text-white border border-gray-600 p-3 pr-10 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 w-64"
+                className="bg-black text-white border border-white p-3 pr-10 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 w-full md:w-64"
                 placeholder="e.g., 2023-08-15"
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="absolute right-3 top-3 text-gray-400"
+                className="absolute right-3 top-3 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -144,34 +147,35 @@ const UserDonations = () => {
             </div>
           </div>
         </div>
-        {/* Sort by Date */}
-        <div>
-          <label htmlFor="sortOrder" className="mr-2 text-lg font-semibold text-gray-200">
+        {/* Second Row: Sort by Date */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="sortOrder" className="text-lg font-semibold text-white">
             Sort by Date:
           </label>
           <select
             id="sortOrder"
             value={sortOrder}
             onChange={handleSortOrderChange}
-            className="bg-gray-800 text-white border border-gray-600 p-2 rounded-md shadow-lg hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="bg-black text-white border border-white p-2 rounded-md shadow-lg hover:border-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="latest">Latest</option>
             <option value="oldest">Oldest</option>
           </select>
         </div>
       </div>
-
+  
       {/* Donations Table */}
-      <div className="bg-gray-800 pb-4 rounded">
+    
+      <div className="bg-black pb-4 rounded border border-white">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-700 text-white">
-              <th className="px-4 py-2 text-center">Sr.</th>
-              <th className="px-4 py-2 text-left">Donor Name</th>
-              <th className="px-4 py-2 text-left">Donation Type</th>
-              <th className="px-4 py-2 text-center">Quantity</th>
-              <th className="px-4 py-2 text-center">Date Received</th>
-              <th className="px-4 py-2 text-center">Associated Center</th>
+            <tr className="bg-black text-white">
+              <th className="px-4 py-2 text-center border border-white">Sr.</th>
+              <th className="px-4 py-2 text-left border border-white">Donor Name</th>
+              <th className="px-4 py-2 text-left border border-white">Donation Type</th>
+              <th className="px-4 py-2 text-center border border-white">Quantity</th>
+              <th className="px-4 py-2 text-center border border-white">Date Received</th>
+              <th className="px-4 py-2 text-center border border-white">Associated Center</th>
             </tr>
           </thead>
           <tbody>
@@ -185,23 +189,23 @@ const UserDonations = () => {
               </tr>
             ) : visibleDonations.length > 0 ? (
               visibleDonations.map((donation, index) => (
-                <tr key={donation.DonationID} className="hover:bg-gray-700">
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                <tr key={donation.DonationID} className="hover:bg-black transition duration-200">
+                  <td className="px-4 py-2 text-center border-b border-white">
                     {startIndex + index + 1}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border-b border-white">
                     {donation.DonorName}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border-b border-white">
                     {donation.DonationType}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                  <td className="px-4 py-2 text-center border-b border-white">
                     {donation.Quantity}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                  <td className="px-4 py-2 text-center border-b border-white">
                     {moment(donation.DateReceived).format("LLL")}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                  <td className="px-4 py-2 text-center border-b border-white">
                     {donation.AssociatedCenter}
                   </td>
                 </tr>
@@ -216,13 +220,13 @@ const UserDonations = () => {
           </tbody>
         </table>
       </div>
-
+  
       {/* Pagination Controls */}
       <div className="mt-4 flex justify-center items-center space-x-4">
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
-          className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded disabled:opacity-50"
+          className="bg-black border border-white hover:bg-black text-white px-3 py-1 rounded disabled:opacity-50"
         >
           Prev
         </button>
@@ -232,13 +236,15 @@ const UserDonations = () => {
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded disabled:opacity-50"
+          className="bg-black border border-white hover:bg-black text-white px-3 py-1 rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
     </div>
   );
+  
+
 };
 
 export default UserDonations;

@@ -261,8 +261,8 @@ const AllAidRequests = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <h1 className="text-3xl font-bold mb-4 text-yellow-500">
+    <div className="min-h-screen bg-black text-white p-4">
+      <h1 className="text-4xl m-10 pb-10 font-bold mb-4 text-yellow-500">
         All Aid Requests
       </h1>
 
@@ -338,10 +338,10 @@ const AllAidRequests = () => {
       </div>
 
       {/* Aid Requests Table */}
-      <div className="bg-gray-800 rounded overflow-x-auto">
+      <div className="bg-black border rounded overflow-x-auto">
         <table className="min-w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-700 text-white">
+            <tr className="bg-black border  text-white">
               <th className="px-4 py-2 text-center">Sr.</th>
               <th className="px-4 py-2 text-left">Requester Name</th>
               <th className="px-4 py-2 text-left">Contact Info</th>
@@ -363,7 +363,7 @@ const AllAidRequests = () => {
               </tr>
             ) : currentRequests.length > 0 ? (
               currentRequests.map((request, index) => (
-                <tr key={request.RequestID} className="hover:bg-gray-700">
+                <tr key={request.RequestID} className="hover:transform hover:scale-95 transition-all duration-300">
                   <td className="px-4 py-2 text-center border-b border-gray-600">
                     {index + 1 + (currentPage - 1) * ITEMS_PER_PAGE}
                   </td>
@@ -390,7 +390,7 @@ const AllAidRequests = () => {
                     {aidPrepStatuses[request.RequestID] === "Completed" ? (
                       <button
                         disabled
-                        className="bg-gray-600 text-white px-3 py-1 rounded cursor-not-allowed"
+                        className="text-white px-3 py-1 rounded cursor-not-allowed"
                       >
                         Preparation completed
                       </button>

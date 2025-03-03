@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import  { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { ThreeDots } from 'react-loader-spinner';
@@ -137,13 +137,13 @@ const RescueTrackingTasks = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <h1 className="text-3xl font-bold text-yellow-500 mb-4">Assigned Tasks</h1>
-      <div className="bg-gray-800 pb-4 rounded">
+    <div className="min-h-screen bg-black text-white p-4">
+      <h1 className="text-3xl text-center m-5 pb-10 font-bold text-yellow-500 mb-4">Assigned Tasks</h1>
+      <div className="bg-black pb-4 rounded">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-700">
-              <th className="px-4 py-2">#</th>
+            <tr className="bg-black border">
+              <th className="px-4 py-2">No</th>
               <th className="px-4 py-2 text-left">Area Name</th>
               <th className="px-4 py-2 text-left">Requester Name</th>
               <th className="px-4 py-2 text-left">Contact Info</th>
@@ -166,7 +166,7 @@ const RescueTrackingTasks = () => {
               </tr>
             ) : volunteersResTasks.length > 0 ? (
               volunteersResTasks.map((task, index) => (
-                <tr key={task.task_id} className="hover:bg-gray-700">
+                <tr key={task.task_id} className="hover:text-white hover:transform hover:scale-95 transition-all duration-200">
                   <td className="px-4 py-2 text-center border-b border-gray-600">{index + 1}</td>
                   <td className="px-4 py-2 border-b border-gray-600">{task.area_name}</td>
                   <td className="px-4 py-2 border-b border-gray-600">{task.RequesterName}</td>
@@ -180,7 +180,7 @@ const RescueTrackingTasks = () => {
                     {task.status === 'Completed' ? (
                       <button
                         disabled
-                        className="bg-gray-500 text-white px-2 py-1 rounded cursor-not-allowed"
+                        className="text-green-600 px-2 py-1 rounded cursor-not-allowed"
                       >
                         Completed
                       </button>
@@ -188,7 +188,7 @@ const RescueTrackingTasks = () => {
                       <>
                         <button
                           onClick={() => handleMarkCompleted(task)}
-                          className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded mr-2"
+                          className="bg-yellow-600 text-white px-2 py-1 rounded mr-2"
                         >
                           Mark as Completed
                         </button>

@@ -42,7 +42,7 @@ const AdminSideBar = ({ isOpen, setIsOpen, user }) => {
           { to: "/admin-panel/all-relief-centers", icon: <FaBuilding />, label: "All Relief Centers" },
           { to: "/admin-panel/all-aid-requests", icon: <FaHandsHelping />, label: "All Aid Requests" },
           { to: "/admin-panel/aid-preparations", icon: <FaClipboardList />, label: "Aid Preparations" },
-          { to: "/admin-panel/aid-reports", icon: <FaChartBar />, label: "Aid Reports" },
+          // { to: "/admin-panel/aid-reports", icon: <FaChartBar />, label: "Aid Reports" },
           { to: "/admin-panel/admin-logout", icon: <FaRightFromBracket />, label: "LogOut" }
         ].map(({ to, icon, label }) => (
           <NavLink

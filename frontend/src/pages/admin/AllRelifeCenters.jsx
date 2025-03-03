@@ -273,18 +273,18 @@ const AllReliefCenters = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
+    <div className="min-h-screen bg-black text-white p-4">
       {/* Header with Add Button */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">Relief Centers</h2>
+        <h2 className="text-4xl text-yellow-600 m-5 font-bold">Relief Centers</h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
+          className="bg-yellow-600 text-white px-4 py-2 rounded"
         >
           Add New Relief Center
         </button>
       </div>
-
+  
       {/* Search & Sort Controls */}
       <div className="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
         <div className="flex items-center mb-2 md:mb-0">
@@ -333,24 +333,24 @@ const AllReliefCenters = () => {
           </select>
         </div>
       </div>
-
+  
       {/* Relief Centers Table */}
-      <div className="bg-gray-800 pb-4 rounded">
-        <table className="w-full border-collapse">
+      <div className="bg-black pb-4 rounded">
+        <table className="w-full border-collapse border border-gray-600">
           <thead>
-            <tr className="bg-gray-700 text-white">
-              <th className="px-4 py-2 text-center">Sr.</th>
-              <th className="px-4 py-2 text-left">Center Name</th>
-              <th className="px-4 py-2 text-left">Location</th>
-              <th className="px-4 py-2 text-center">Volunteers Working</th>
-              <th className="px-4 py-2 text-center">Max Capacity</th>
+            <tr className="bg-black border text-white">
+              <th className="px-4 py-2 text-center border-r border-gray-600">Sr.</th>
+              <th className="px-4 py-2 text-left border-r border-gray-600">Center Name</th>
+              <th className="px-4 py-2 text-left border-r border-gray-600">Location</th>
+              <th className="px-4 py-2 text-center border-r border-gray-600">Volunteers Working</th>
+              <th className="px-4 py-2 text-center border-r border-gray-600">Max Capacity</th>
               <th className="px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
             {showLoader ? (
               <tr>
-                <td colSpan="7" className="text-center p-4">
+                <td colSpan="7" className="text-center  p-4">
                   <div className="flex justify-center items-center">
                     <ThreeDots color="#7542ff" height={80} width={80} />
                   </div>
@@ -359,7 +359,7 @@ const AllReliefCenters = () => {
             ) : visibleCenters.length > 0 ? (
               visibleCenters.map((center, index) => (
                 <React.Fragment key={center.CenterID || index}>
-                  <tr className="hover:bg-gray-700">
+                  <tr className=" hover:transform hover:scale-95 transition-all duration-300">
                     <td className="px-4 py-2 text-center border-b border-gray-600">
                       {startIndex + index + 1}
                     </td>
@@ -377,7 +377,7 @@ const AllReliefCenters = () => {
                     </td>
                     <td className="px-4 py-2 text-center border-b border-gray-600">
                       <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 mr-1 rounded"
+                        className="bg-transparent border border-yellow-600 hover:bg-yellow-600 hover:text-black text-white px-2 py-1 mr-1 rounded"
                         onClick={() =>
                           toggleExpand(center.CenterID, "volunteers")
                         }
@@ -385,7 +385,7 @@ const AllReliefCenters = () => {
                         Volunteers
                       </button>
                       <button
-                        className="bg-green-500 hover:bg-green-700 text-white px-2 py-1 mr-1 rounded"
+                        className="bg-transparent border border-yellow-600 hover:bg-yellow-600 hover:text-black text-white px-2 py-1 mr-1 rounded"
                         onClick={() =>
                           toggleExpand(center.CenterID, "donations")
                         }
@@ -393,7 +393,7 @@ const AllReliefCenters = () => {
                         Donations
                       </button>
                       <button
-                        className="bg-purple-500 hover:bg-purple-700 text-white px-2 py-1 rounded"
+                        className="bg-transparent border border-yellow-600 hover:bg-yellow-600 hover:text-black text-white px-2 py-1 rounded"
                         onClick={() =>
                           toggleExpand(center.CenterID, "resources")
                         }
@@ -416,7 +416,7 @@ const AllReliefCenters = () => {
           </tbody>
         </table>
       </div>
-
+  
       {/* Pagination Controls */}
       <div className="mt-4 flex justify-center items-center space-x-4">
         <button
@@ -437,7 +437,7 @@ const AllReliefCenters = () => {
           Next
         </button>
       </div>
-
+  
       {/* Add Relief Center Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -541,6 +541,7 @@ const AllReliefCenters = () => {
       )}
     </div>
   );
+  
 };
 
 export default AllReliefCenters;

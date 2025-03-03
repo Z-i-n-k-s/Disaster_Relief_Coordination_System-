@@ -92,25 +92,25 @@ const UpdateUserInfo = ({ user, onClose, callFunc }) => {
   };
 
   return (
-    <div className="fixed top-0 bottom-0 left-0 right-0 w-full z-10 flex justify-center items-center bg-slate-200 bg-opacity-50">
+    <div className="fixed top-0 bottom-0 left-0 right-0 w-full z-10 flex justify-center items-center bg-black bg-opacity-70">
       {showLoader ? (
-        <div className="flex justify-center items-center bg-white shadow-lg p-6 w-full max-w-lg rounded-lg h-40">
-          <ThreeDots type="ThreeDots" color="#7542ff" height={80} width={80} />
+        <div className="flex justify-center items-center bg-gray-900 shadow-lg p-6 w-full max-w-lg rounded-lg h-40">
+          <ThreeDots type="ThreeDots" color="#FFD700" height={80} width={80} />
         </div>
       ) : (
-        <div className="relative bg-white shadow-lg p-6 w-full max-w-lg rounded-lg">
+        <div className="relative bg-gray-900 shadow-lg p-6 w-full max-w-lg rounded-lg text-white">
           <button
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-200"
             onClick={onClose}
           >
             <FaWindowClose size={24} />
           </button>
-          <h1 className="pb-4 text-2xl font-semibold text-center text-gray-800">
+          <h1 className="pb-4 text-2xl font-semibold text-center text-white">
             Change User Details
           </h1>
-          <div className="text-gray-700 w-full">
+          <div className="w-full">
             <p className="p-2 text-lg">
-              <span className="font-medium">Current Name:</span> {Name}
+              <span className="font-medium text-gray-300">Current Name:</span> {Name}
             </p>
             <input
               type="text"
@@ -118,10 +118,10 @@ const UpdateUserInfo = ({ user, onClose, callFunc }) => {
               name="newName"
               value={userNewName}
               onChange={handleOnChangeName}
-              className="w-full p-2 border border-gray-300 rounded-lg bg-white mb-4"
+              className="w-full p-2 border border-gray-700 rounded-lg bg-gray-800 text-white mb-4"
             />
             <p className="p-2 text-lg">
-              <span className="font-medium">Current Email:</span> {Email}
+              <span className="font-medium text-gray-300">Current Email:</span> {Email}
             </p>
             <input
               type="email"
@@ -129,10 +129,10 @@ const UpdateUserInfo = ({ user, onClose, callFunc }) => {
               name="newEmail"
               value={userNewEmail}
               onChange={handleOnChangeEmail}
-              className="w-full p-2 border border-gray-300 rounded-lg bg-white mb-4"
+              className="w-full p-2 border border-gray-700 rounded-lg bg-gray-800 text-white mb-4"
             />
             <p className="p-2 text-lg">
-              <span className="font-medium">Current Phone Number:</span> {PhoneNo}
+              <span className="font-medium text-gray-300">Current Phone Number:</span> {PhoneNo}
             </p>
             <input
               type="text"
@@ -140,14 +140,14 @@ const UpdateUserInfo = ({ user, onClose, callFunc }) => {
               name="newPhoneNo"
               value={userNewPhoneNo}
               onChange={handleOnChangePhoneNo}
-              className="w-full p-2 border border-gray-300 rounded-lg bg-white mb-4"
+              className="w-full p-2 border border-gray-700 rounded-lg bg-gray-800 text-white mb-4"
             />
             <div className="flex items-center justify-between my-4">
-              <p className="text-lg">
+              <p className="text-lg text-gray-300">
                 <span className="font-medium">Role:</span>
               </p>
               <select
-                className="border px-4 py-2 rounded-lg"
+                className="border border-gray-700 px-4 py-2 rounded-lg bg-gray-800 text-white"
                 value={userRole}
                 onChange={handleOnChangeSelect}
               >
@@ -160,11 +160,11 @@ const UpdateUserInfo = ({ user, onClose, callFunc }) => {
             </div>
             {(userRole === "Volunteer" || userRole === "Manager") && (
               <div className="flex items-center justify-between my-4">
-                <p className="text-lg">
+                <p className="text-lg text-gray-300">
                   <span className="font-medium">Select Center:</span>
                 </p>
                 <select
-                  className="border px-4 py-2 rounded-lg"
+                  className="border border-gray-700 px-4 py-2 rounded-lg bg-gray-800 text-white"
                   value={selectedCenter}
                   onChange={(e) => setSelectedCenter(e.target.value)}
                 >
@@ -180,13 +180,13 @@ const UpdateUserInfo = ({ user, onClose, callFunc }) => {
           </div>
           <div className="flex justify-center mt-4">
             <button
-              className="bg-green-400 text-black px-4 py-2 rounded-full shadow hover:bg-green-700 hover:text-white transition duration-300"
+              className="bg-yellow-500 text-black font-semibold px-4 py-2 rounded-full shadow hover:bg-yellow-600 transition duration-300"
               onClick={updateInfo}
             >
               Change
             </button>
             <button
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded-full shadow ml-4 hover:bg-gray-400 transition duration-300"
+              className="bg-gray-600 text-white px-4 py-2 rounded-full shadow ml-4 hover:bg-gray-500 transition duration-300"
               onClick={onClose}
             >
               Cancel
@@ -196,6 +196,7 @@ const UpdateUserInfo = ({ user, onClose, callFunc }) => {
       )}
     </div>
   );
+  
 };
 
 export default UpdateUserInfo;

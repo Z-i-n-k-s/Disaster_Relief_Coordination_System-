@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import  { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { ThreeDots } from "react-loader-spinner";
 import apiClient from "../../api/Api";
@@ -229,17 +229,17 @@ const AssignedTasks = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <h1 className="text-3xl font-bold text-yellow-500 mb-4">
+    <div className="min-h-screen bg-black text-white p-4">
+      <h1 className="text-3xl m-5 pb-10 text-center font-bold text-yellow-500 mb-4">
         Assigned Tasks
       </h1>
 
       {/* Tasks Table */}
-      <div className="bg-gray-800 pb-4 rounded">
+      <div className="bg-black pb-4 rounded">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-700">
-              <th className="px-4 py-2">#</th>
+            <tr className="bg-black border">
+              <th className="px-4 py-2">No</th>
               <th className="px-4 py-2 text-left">Request Type</th>
               <th className="px-4 py-2 text-left">Description</th>
               <th className="px-4 py-2 text-left">Urgency Level</th>
@@ -257,7 +257,7 @@ const AssignedTasks = () => {
               </tr>
             ) : tasksToShow.length > 0 ? (
               tasksToShow.map((task, index) => (
-                <tr key={task.task_id} className="hover:bg-gray-700">
+                <tr key={task.task_id} className="hover:text-white hover:transform hover:scale-95 transition-all duration-200">
                   <td className="px-4 py-2 text-center border-b border-gray-600">
                     {index + 1}
                   </td>
@@ -276,7 +276,7 @@ const AssignedTasks = () => {
                         {task.task_status === "Completed" ? (
                           <button
                             disabled
-                            className="bg-gray-500 text-white px-4 py-2 rounded"
+                            className="text-green-600 px-4 py-2 rounded"
                           >
                             Completed preparations
                           </button>
@@ -284,7 +284,7 @@ const AssignedTasks = () => {
                           <>
                             <button
                               onClick={() => handleAddResource(task)}
-                              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                              className="bg-gray-800 text-white px-4 py-2 rounded"
                             >
                               {task.RequestType === "Aid"
                                 ? "Prepare Aid"
@@ -293,7 +293,7 @@ const AssignedTasks = () => {
                             {task.hasAidResources && (
                               <button
                                 onClick={() => handleMarkComplete(task)}
-                                className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded"
+                                className="bg-yellow-600 text-white px-4 py-2 rounded"
                               >
                                 Mark as Completed
                               </button>

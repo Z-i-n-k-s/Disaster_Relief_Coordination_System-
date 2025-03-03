@@ -22,7 +22,7 @@ const UserPanel = () => {
         setIsOpen={setSidebarOpen}
         user={user}
       />
-      <main className="flex-grow px-2 py-4 transition-all">
+      <main className="flex-grow border-l transition-all">
         <Outlet />
       </main>
     </div>

@@ -32,21 +32,21 @@ const DeleteUserDetails = ({ onClose, user, callFunc }) => {
   };
 
   return (
-    <div className="fixed top-0 bottom-0 left-0 right-0 w-full z-10 flex justify-center items-center bg-slate-200 bg-opacity-50">
+    <div className="fixed top-0 bottom-0 left-0 right-0 w-full z-10 flex justify-center items-center bg-black bg-opacity-70">
       {showLoader ? (
-        <div className="flex justify-center items-center bg-white shadow-lg p-6 w-full max-w-lg rounded-lg h-40">
-          <ThreeDots type="ThreeDots" color="#7542ff" height={80} width={80} />
+        <div className="flex justify-center items-center bg-gray-900 shadow-lg p-6 w-full max-w-lg rounded-lg h-40">
+          <ThreeDots type="ThreeDots" color="#FFD700" height={80} width={80} />
         </div>
       ) : (
-        <div className="relative bg-white shadow-lg p-6 w-full max-w-lg rounded-lg">
+        <div className="relative bg-gray-900 shadow-lg p-6 w-full max-w-lg rounded-lg text-white">
           <button
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-200"
             onClick={onClose}
           >
             <FaWindowClose size={24} />
           </button>
-          <h1 className="pb-4 text-2xl font-semibold text-center text-gray-800">
-            Delete User ?
+          <h1 className="pb-4 text-2xl font-semibold text-center text-white">
+            Delete User?
           </h1>
           <div className="flex flex-col items-center">
             {imgError || !profilePic ? (
@@ -59,26 +59,26 @@ const DeleteUserDetails = ({ onClose, user, callFunc }) => {
                 onError={() => setImgError(true)}
               />
             )}
-            <div className="text-gray-700 w-full text-center">
+            <div className="w-full text-center text-gray-300">
               <p className="p-2 text-lg">
-                <span className="font-medium">Name:</span> {Name}
+                <span className="font-medium text-gray-400">Name:</span> {Name}
               </p>
               <p className="p-2 text-lg">
-                <span className="font-medium">Email:</span> {Email}
+                <span className="font-medium text-gray-400">Email:</span> {Email}
               </p>
               <p className="p-2 text-lg">
-                <span className="font-medium">Role:</span> {Role}
+                <span className="font-medium text-gray-400">Role:</span> {Role}
               </p>
             </div>
             <div className="flex justify-center mt-4">
               <button
-                className="bg-red-400 text-black px-4 py-2 rounded-lg shadow hover:bg-red-600 hover:text-white transition duration-300"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 transition duration-300"
                 onClick={deleteUser}
               >
                 Confirm
               </button>
               <button
-                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow ml-4 hover:bg-gray-400 transition duration-300"
+                className="bg-yellow-500 text-black px-4 py-2 rounded-lg shadow ml-4 hover:bg-yellow-600 transition duration-300"
                 onClick={onClose}
               >
                 Cancel
@@ -89,6 +89,7 @@ const DeleteUserDetails = ({ onClose, user, callFunc }) => {
       )}
     </div>
   );
+  
 };
 
 export default DeleteUserDetails;

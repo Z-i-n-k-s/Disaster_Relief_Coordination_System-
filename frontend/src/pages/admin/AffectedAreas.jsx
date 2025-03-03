@@ -137,9 +137,8 @@ const AffectedAreas = () => {
       handleAddAreaSubmit(e);
     }
   };
-
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
+    <div className="min-h-screen bg-black text-white p-4">
       {/* Header with New Area Button */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold text-yellow-500">Affected Areas</h1>
@@ -150,7 +149,7 @@ const AffectedAreas = () => {
           New Area
         </button>
       </div>
-
+  
       {/* Filter and Search Controls */}
       <div className="mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div className="flex flex-col md:flex-row md:gap-4">
@@ -214,18 +213,18 @@ const AffectedAreas = () => {
           </div>
         </div>
       </div>
-
+  
       {/* Areas Table */}
-      <div className="bg-gray-800 pb-4 rounded">
+      <div className="bg-black pb-4 rounded">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-700 text-white">
-              <th className="px-4 py-2 text-center">Sr.</th>
-              <th className="px-4 py-2 text-left">Area Name</th>
-              <th className="px-4 py-2 text-left">Area Type</th>
-              <th className="px-4 py-2 text-left">Severity Level</th>
-              <th className="px-4 py-2 text-left">Population</th>
-              <th className="px-4 py-2 text-center">Action</th>
+            <tr className="bg-black text-white">
+              <th className="px-4 py-2 text-center border border-white">Sr.</th>
+              <th className="px-4 py-2 text-left border border-white">Area Name</th>
+              <th className="px-4 py-2 text-left border border-white">Area Type</th>
+              <th className="px-4 py-2 text-left border border-white">Severity Level</th>
+              <th className="px-4 py-2 text-left border border-white">Population</th>
+              <th className="px-4 py-2 text-center border border-white">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -239,23 +238,26 @@ const AffectedAreas = () => {
               </tr>
             ) : filteredAreas.length > 0 ? (
               filteredAreas.map((area, index) => (
-                <tr key={area.AreaID} className="hover:bg-gray-700">
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                <tr 
+                  key={area.AreaID} 
+                  className="hover:text-white hover:transform hover:scale-95 transition-all duration-200"
+                >
+                  <td className="px-4 py-2 text-center border border-white text-gray-400">
                     {index + 1}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border border-white text-gray-400">
                     {area.AreaName}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border border-white text-gray-400">
                     {area.AreaType}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border border-white text-gray-400">
                     {area.SeverityLevel}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border border-white text-gray-400">
                     {area.Population}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                  <td className="px-4 py-2 text-center border border-white">
                     <div className="flex justify-center gap-2">
                       <button
                         className="bg-green-500 text-white p-2 rounded-full transition-transform duration-200 transform hover:scale-110"
@@ -275,7 +277,7 @@ const AffectedAreas = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center p-4">
+                <td colSpan="6" className="text-center p-4 text-gray-400">
                   No areas found.
                 </td>
               </tr>
@@ -283,7 +285,7 @@ const AffectedAreas = () => {
           </tbody>
         </table>
       </div>
-
+  
       {/* Edit/New Area Modal */}
       {(openEditModal || openNewModal) && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -367,7 +369,7 @@ const AffectedAreas = () => {
           </div>
         </div>
       )}
-
+  
       {/* Delete Confirmation Modal */}
       {openDeleteModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -399,6 +401,9 @@ const AffectedAreas = () => {
       )}
     </div>
   );
+  
+  
+  
 };
 
 export default AffectedAreas;

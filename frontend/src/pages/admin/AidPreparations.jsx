@@ -222,11 +222,11 @@ const AidPreparations = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6 flex flex-col items-center">
-      <h1 className="text-4xl font-bold mb-6 text-yellow-500">Aid Preparations</h1>
-      <div className="bg-gray-800 rounded-lg shadow-lg w-full max-w-6xl overflow-hidden">
+    <div className="min-h-screen bg-black text-white p-6 flex flex-col ">
+      <h1 className="text-4xl font-bold mb-6 pb-10 text-yellow-500">Aid Preparations</h1>
+      <div className="bg-black  w-full max-w-6xl overflow-hidden">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-700 text-gray-300 uppercase text-sm">
+          <thead className="bg-black border text-white uppercase text-sm">
             <tr>
               <th className="px-6 py-3">Request Type</th>
               <th className="px-6 py-3">Description</th>
@@ -247,7 +247,7 @@ const AidPreparations = () => {
                   <tr
                     key={PreparationID}
                     className={`border-b border-gray-700 ${
-                      index % 2 === 0 ? "bg-gray-800" : "bg-gray-900"
+                      index % 2 === 0 ? "bg-black border" : "bg-black border"
                     }`}
                   >
                     <td className="px-6 py-4">{requestInfo.RequestType}</td>
@@ -261,13 +261,13 @@ const AidPreparations = () => {
                         trackingRecord && trackingRecord.TrackingStatus === "Completed" ? (
                           <button
                             disabled
-                            className="bg-gray-600 text-white px-4 py-2 rounded-lg"
+                            className="text-green-600 px-4 py-2 rounded-lg"
                           >
                             Tracking Completed
                           </button>
                         ) : (
                           <button
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition"
+                            className=" text-red-600 px-4 py-2 rounded-lg transition"
                             onClick={() => handleSendVolunteers(prep)}
                           >
                             Send Volunteers to Help

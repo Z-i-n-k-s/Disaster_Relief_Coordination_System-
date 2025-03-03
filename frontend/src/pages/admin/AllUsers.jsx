@@ -103,22 +103,21 @@ const AllUsers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
+    <div className="min-h-screen bg-black text-white p-4">
+        <h1 className="text-4xl font-bold text-yellow-600 m-5">All Users</h1>
       {/* Sorting, Filtering, and Search Controls */}
-      <div className="mb-4 flex flex-col md:flex-row md:justify-between md:items-center">
-        <div className="flex flex-col md:flex-row md:gap-4">
-          <div className="mb-2 md:mb-0">
-            <label
-              htmlFor="roleFilter"
-              className="mr-2 text-lg font-semibold text-gray-200"
-            >
+      <div className="mb-4 space-y-4">
+        {/* First Row: Filter by Role and Search */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <label htmlFor="roleFilter" className="text-lg font-semibold text-white">
               Filter by Role:
             </label>
             <select
               id="roleFilter"
               value={filterRole}
               onChange={handleFilterChange}
-              className="bg-gray-800 text-white border border-gray-600 p-2 rounded-md shadow-lg hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="bg-black text-white border border-white p-2 rounded-md shadow-lg hover:border-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="all">All</option>
               <option value="Admin">Admin</option>
@@ -127,11 +126,8 @@ const AllUsers = () => {
               <option value="Volunteer">Volunteer</option>
             </select>
           </div>
-          <div className="mb-2 md:mb-0 flex items-center">
-            <label
-              htmlFor="search"
-              className="mr-2 text-lg font-semibold text-gray-200"
-            >
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <label htmlFor="search" className="text-lg font-semibold text-white">
               Search:
             </label>
             <div className="relative">
@@ -140,12 +136,12 @@ const AllUsers = () => {
                 type="text"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-gray-800 text-white border border-gray-600 p-3 pr-10 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 w-64"
+                className="bg-black text-white border border-white p-3 pr-10 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 w-64"
                 placeholder="Search by name or email"
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="absolute right-3 top-3 text-gray-400"
+                className="absolute right-3 top-3 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -162,37 +158,36 @@ const AllUsers = () => {
             </div>
           </div>
         </div>
-        <div>
-          <label
-            htmlFor="sortOrder"
-            className="mr-2 text-lg font-semibold text-gray-200"
-          >
+        {/* Second Row: Sort by Date */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="sortOrder" className="text-lg font-semibold text-white">
             Sort by Date:
           </label>
           <select
             id="sortOrder"
             value={sortOrder}
             onChange={handleSortOrderChange}
-            className="bg-gray-800 text-white border border-gray-600 p-2 rounded-md shadow-lg hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="bg-black text-white border border-white p-2 rounded-md shadow-lg hover:border-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="latest">Latest</option>
             <option value="oldest">Oldest</option>
           </select>
         </div>
       </div>
-
+  
       {/* Users Table */}
-      <div className="bg-gray-800 pb-4 rounded">
+    
+      <div className="bg-black pb-4 rounded border border-white">
         <table className="w-full userTable border-collapse">
           <thead>
-            <tr className="bg-gray-700 text-white">
-              <th className="px-4 py-2 text-center">Sr.</th>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Email</th>
-              <th className="px-4 py-2 text-left">Phone No</th>
-              <th className="px-4 py-2 text-center">Role</th>
-              <th className="px-4 py-2 text-center">Join Date</th>
-              <th className="px-4 py-2 text-center">Action</th>
+            <tr className="bg-black text-white">
+              <th className="px-4 py-2 text-center border border-white">Sr.</th>
+              <th className="px-4 py-2 text-left border border-white">Name</th>
+              <th className="px-4 py-2 text-left border border-white">Email</th>
+              <th className="px-4 py-2 text-left border border-white">Phone No</th>
+              <th className="px-4 py-2 text-center border border-white">Role</th>
+              <th className="px-4 py-2 text-center border border-white">Join Date</th>
+              <th className="px-4 py-2 text-center border border-white">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -206,26 +201,26 @@ const AllUsers = () => {
               </tr>
             ) : visibleUsers.length > 0 ? (
               visibleUsers.map((el, index) => (
-                <tr key={el.UserID || index} className="hover:bg-gray-700">
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                <tr key={el.UserID || index} className="hover:bg-black transition duration-200">
+                  <td className="px-4 py-2 text-center border-b border-white">
                     {startIndex + index + 1}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border-b border-white">
                     {el?.Name}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border-b border-white">
                     {el?.Email}
                   </td>
-                  <td className="px-4 py-2 text-left border-b border-gray-600">
+                  <td className="px-4 py-2 text-left border-b border-white">
                     {el?.PhoneNo}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                  <td className="px-4 py-2 text-center border-b border-white">
                     {el?.Role}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                  <td className="px-4 py-2 text-center border-b border-white">
                     {moment(el?.created_at).format("LLL")}
                   </td>
-                  <td className="px-4 py-2 text-center border-b border-gray-600">
+                  <td className="px-4 py-2 text-center border-b border-white">
                     <div className="flex justify-center gap-2">
                       <button
                         className="bg-green-500 p-2 rounded-full hover:bg-green-700"
@@ -248,7 +243,7 @@ const AllUsers = () => {
                       <button
                         className="bg-blue-500 p-2 rounded-full hover:bg-blue-700"
                         onClick={() => {
-                          setUpdateUserDetails(el); // 'el' contains the full user object
+                          setUpdateUserDetails(el);
                           setOpenUserDetails(true);
                         }}
                       >
@@ -268,13 +263,13 @@ const AllUsers = () => {
           </tbody>
         </table>
       </div>
-
+  
       {/* Pagination Controls */}
       <div className="mt-4 flex justify-center items-center space-x-4">
         <button
           onClick={handlePrevPage}
           disabled={currentPage === 1}
-          className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded disabled:opacity-50"
+          className="bg-black border border-white hover:bg-black text-white px-3 py-1 rounded disabled:opacity-50"
         >
           Prev
         </button>
@@ -284,36 +279,25 @@ const AllUsers = () => {
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded disabled:opacity-50"
+          className="bg-black border border-white hover:bg-black text-white px-3 py-1 rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
-
+  
       {/* Modals */}
       {openUpdateUser && (
-        <UpdateUserInfo
-          onClose={() => setOpenUpdateUser(false)}
-          user={updateUserDetails}
-          callFunc={fetchAllusers}
-        />
+        <UpdateUserInfo onClose={() => setOpenUpdateUser(false)} user={updateUserDetails} callFunc={fetchAllusers} />
       )}
       {openUserDetails && (
-        <DisplayUserDetails
-          onClose={() => setOpenUserDetails(false)}
-          user={updateUserDetails} // Passing the full user data
-          callFunc={fetchAllusers}
-        />
+        <DisplayUserDetails onClose={() => setOpenUserDetails(false)} user={updateUserDetails} callFunc={fetchAllusers} />
       )}
       {openDelete && (
-          <DeleteUserDetails
-          onClose={() => setOpenDelete(false)}
-          user={updateUserDetails} // Passing the full user data
-          callFunc={fetchAllusers}
-        />
+        <DeleteUserDetails onClose={() => setOpenDelete(false)} user={updateUserDetails} callFunc={fetchAllusers} />
       )}
     </div>
   );
+  
 };
 
 export default AllUsers;
