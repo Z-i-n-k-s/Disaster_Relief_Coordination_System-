@@ -68,4 +68,14 @@ class RescueTrackingController extends Controller
         }
         return response()->json($tracking, 200);
     }
+    
+    public function index()
+    {
+        $data = $this->rescueTrackingService->getAllTracking();
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+   
 }

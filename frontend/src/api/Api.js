@@ -495,6 +495,14 @@ class ApiClient {
       throw error.response?.data || error.message;
     }
   }
+  async getTracking() {
+    try {
+      const response = await this.client.get(`api/tracking`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
   async updateRescueTracking(id,updateData) {
     try {
       const response = await this.client.patch(`api/rescue-tracking/${id}`,updateData);

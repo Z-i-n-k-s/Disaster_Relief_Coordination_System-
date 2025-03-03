@@ -15,8 +15,8 @@ class RescueTrackingVolunteerService
     public function create(int $trackingId, int $volunteerId)
 {
     // Check if a record with the given VolunteerID already exists.
-    $sqlSelect = "SELECT * FROM rescue_tracking_volunteers WHERE VolunteerID = ?";
-    $existing = DB::selectOne($sqlSelect, [$volunteerId]);
+    $sqlSelect = "SELECT * FROM rescue_tracking_volunteers WHERE TrackingID = ?";
+    $existing = DB::selectOne($sqlSelect, [$trackingId]);
 
     if ($existing) {
         // Return the existing record if found.

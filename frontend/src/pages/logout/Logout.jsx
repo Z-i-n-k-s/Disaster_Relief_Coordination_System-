@@ -29,9 +29,9 @@ const Logout = () => {
           localStorage.removeItem("refresh_token");
 
           toast.success("Logged out successfully");
-          setTimeout(() => {
+          
             navigate("/");
-          }, 1000);
+          
         } else {
           const errorMessage = response?.message || "Logout failed!";
           toast.error(errorMessage, { position: "top-center" });
@@ -40,7 +40,10 @@ const Logout = () => {
         const errorMessage = error.response?.data?.message || "Something went wrong!";
         toast.error(errorMessage, { position: "top-center" });
       } finally {
-        setLoading(false);
+       
+         setLoading(false); 
+        
+        
       }
     };
 

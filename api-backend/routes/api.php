@@ -156,6 +156,7 @@ Route::get('/volunteers/{volunteerId}/rescue-tracking-tasks', [VolunteerTaskCont
 Route::post('/rescue-tracking', [RescueTrackingController::class, 'store']);
 Route::patch('/rescue-tracking/{id}', [RescueTrackingController::class, 'update']);
 Route::get('/rescue-tracking/{id}', [RescueTrackingController::class, 'show']);
+Route::get('/tracking', [RescueTrackingController::class, 'index']);
 
 // Rescue Tracking Volunteers endpoints (only create and read)
 Route::get('/rescue-tracking-volunteers', [RescueTrackingVolunteerController::class, 'index']);

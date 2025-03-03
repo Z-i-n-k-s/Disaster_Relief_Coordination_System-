@@ -19,61 +19,15 @@ const AidPreparations = () => {
   const [modalStep, setModalStep] = useState(null);
   const [selectedPreparation, setSelectedPreparation] = useState(null);
   const [departureTime, setDepartureTime] = useState(getTodayDateTimeLocal());
-  const [estimatedArrival, setEstimatedArrival] = useState(
-    getTodayDateTimeLocal()
-  );
-  
-  
+  const [estimatedArrival, setEstimatedArrival] = useState(getTodayDateTimeLocal());
+
   // Full list of volunteers for the volunteer modal
   const [allVolunteers, setAllVolunteers] = useState([]);
   const [allTrackingVolunteers, setAllTrackingVolunteers] = useState([]);
-  const [trackingId, setTrackingId] = useState([]);
-
-  const fetchAllAidPrepDetails = useCallback(async () => {
-    try {
-      const dataResponse = await apiClient.getAidPrepDetails();
-      if (dataResponse?.success) {
-        setAllAidPrepDetails(dataResponse.data);
-      } else {
-        toast.error(dataResponse?.message || "No data received.");
-      }
-    } catch (error) {
-      toast.error("Error fetching aid preparations");
-      console.error("Error:", error);
-    }
-  }, []);
-  const fetchTrackingVolunteers = useCallback(async () => {
-    try {
-      const dataResponse = await apiClient.getRescueTrackingVolunteers();
-      if (dataResponse) {
-        setAllTrackingVolunteers(dataResponse);
-      } else {
-        toast.error(dataResponse?.message || "No data received.");
-      }
-    } catch (error) {
-      toast.error("Error fetching aid preparations");
-      console.error("Error:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTrackingVolunteers();
-    fetchAllAidPrepDetails();
-  }, [fetchAllAidPrepDetails]);
-
-  const fetchAllVolunteers = useCallback(async () => {
-    try {
-      const dataResponse = await apiClient.getAllVolunteers();
-      if (dataResponse && dataResponse.success) {
-        setAllVolunteers(dataResponse.data);
-      } else {
-        toast.error(dataResponse?.message || "No data received.");
-      }
-    } catch (error) {
-      toast.error("Error fetching volunteers");
-      console.error("Error:", error);
-    }
-  }, []);
+  const [trackingData, setTrackingData] = useState([]);
+  const [currentTrackingData, setCurrentTrackingData] = useState([]);
+  // New state to store all tracking records
+  const [allTracking, setAllTracking] = useState([]);
 
   const formatDateTimeLocal = (dateString) => {
     if (!dateString) return "";
@@ -95,8 +49,35 @@ const AidPreparations = () => {
     }
   };
 
+  // Helper to format datetime for the backend (YYYY-MM-DD HH:MM:SS)
+  const formatDateTimeForBackend = (dateInput) => {
+    const date = new Date(dateInput);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+
+  const fetchAllAidPrepDetails = useCallback(async () => {
+    try {
+      const dataResponse = await apiClient.getAidPrepDetails();
+      if (dataResponse?.success) {
+        setAllAidPrepDetails(dataResponse.data);
+      } else {
+        toast.error(dataResponse?.message || "No data received.");
+      }
+    } catch (error) {
+      toast.error("Error fetching aid preparations");
+      console.error("Error:", error);
+    }
+  }, []);
+
   // When "Send Volunteers to Help" is clicked
   const handleSendVolunteers = (prep) => {
+    console.log(prep);
     setSelectedPreparation(prep);
     setDepartureTime(
       prep.DepartureTime
@@ -112,19 +93,55 @@ const AidPreparations = () => {
     setModalStep("timing");
   };
 
-  // Helper to format datetime for the backend (YYYY-MM-DD HH:MM:SS)
-  const formatDateTimeForBackend = (dateInput) => {
-    const date = new Date(dateInput);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  };
+  const fetchTrackingVolunteers = useCallback(async () => {
+    try {
+      const dataResponse = await apiClient.getRescueTrackingVolunteers();
+      console.log("tracking vols", dataResponse);
+      if (dataResponse) {
+        setAllTrackingVolunteers(dataResponse);
+      } else {
+        toast.error(dataResponse?.message || "No data received.");
+      }
+    } catch (error) {
+      toast.error("Error fetching tracking volunteers");
+      console.error("Error:", error);
+    }
+  }, []);
 
-  // This function updates timing details and creates rescue tracking,
+  const fetchAllTracking = useCallback(async () => {
+    try {
+      const dataResponse = await apiClient.getTracking();
+      console.log("trackings info", dataResponse);
+      if (dataResponse && dataResponse.success) {
+        setAllTracking(dataResponse.data);
+      } else {
+        toast.error(dataResponse?.message || "No tracking data received.");
+      }
+    } catch (error) {
+      toast.error("Error fetching tracking records");
+      console.error("Error:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllTracking();
+    fetchAllAidPrepDetails();
+  }, [fetchAllAidPrepDetails, fetchAllTracking]);
+
+  const fetchAllVolunteers = useCallback(async () => {
+    try {
+      const dataResponse = await apiClient.getAllVolunteers();
+      if (dataResponse && dataResponse.success) {
+        setAllVolunteers(dataResponse.data);
+      } else {
+        toast.error(dataResponse?.message || "No data received.");
+      }
+    } catch (error) {
+      toast.error("Error fetching volunteers");
+      console.error("Error:", error);
+    }
+  }, []);
+
   // then switches the modal step to "volunteer" without closing the module.
   const handleAddVolunteers = async () => {
     try {
@@ -147,13 +164,17 @@ const AidPreparations = () => {
           ? formatDateTimeForBackend(departureTime)
           : null,
       };
+      console.log("tracking data ", trackingData);
 
       const res = await apiClient.createRescueTracking(trackingData);
+      setCurrentTrackingData(res);
+      console.log("current tracking data ", res);
 
-      setTrackingId(res.TrackingID);
+      setTrackingData(trackingData);
       toast.success("Timing updated successfully");
       // Instead of closing the modal, switch its content to volunteer list
       await fetchAllVolunteers();
+      await fetchTrackingVolunteers();
       setModalStep("volunteer");
     } catch (error) {
       toast.error("Error updating timing details");
@@ -163,59 +184,46 @@ const AidPreparations = () => {
 
   // Handler for when the user is finished with the rescue process
   const handleDone = async () => {
-    
     setModalStep(null);
-    
     setSelectedPreparation(null);
   };
 
   const handleJoinRescue = async (volunteerId) => {
     // Optimistically update the UI
-    setAllTrackingVolunteers((prev) => [
-      ...prev,
-      { TrackingID: trackingId, VolunteerID: volunteerId },
-    ]);
-  
     try {
-      const data = {
-        TrackingID: trackingId, // As required by the API
-        VolunteerID: volunteerId,
-      };
-  
-      const response = await apiClient.createRescueTrackingVolunteer(data);
-  
-      if (response && response.success) {
-        toast.success("Volunteer added to rescue team");
-        // Re-fetch tracking volunteers to ensure our state is up-to-date
-        await fetchTrackingVolunteers();
-      } else {
-        // Roll back optimistic update if the API call did not succeed
-        setAllTrackingVolunteers((prev) =>
-          prev.filter(
-            (item) => Number(item.VolunteerID) !== Number(volunteerId)
-          )
-        );
-        toast.error(response.message || "Failed to add volunteer");
+      const res = await apiClient.createRescueTracking(trackingData);
+      console.log("create tracking res", res);
+      if (res) {
+        const data = {
+          TrackingID: res.TrackingID, // As required by the API
+          VolunteerID: volunteerId,
+        };
+
+        const response = await apiClient.createRescueTrackingVolunteer(data);
+        console.log(response);
+        if (response) {
+          await fetchTrackingVolunteers();
+          setAllTrackingVolunteers((prev) => [
+            ...prev,
+            { TrackingID: res.TrackingID, VolunteerID: volunteerId },
+          ]);
+          console.log("all track vols ", allTrackingVolunteers);
+          toast.success("Volunteer added to rescue team");
+        } else {
+          // Roll back optimistic update if the API call did not succeed
+          toast.error(response.message || "Failed to add volunteer");
+        }
       }
     } catch (error) {
       // Roll back optimistic update on error
-      setAllTrackingVolunteers((prev) =>
-        prev.filter(
-          (item) => Number(item.VolunteerID) !== Number(volunteerId)
-        )
-      );
       toast.error("Error adding volunteer to rescue team");
       console.error("Error:", error);
     }
   };
-  
-  
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6 flex flex-col items-center">
-      <h1 className="text-4xl font-bold mb-6 text-yellow-500">
-        Aid Preparations
-      </h1>
+      <h1 className="text-4xl font-bold mb-6 text-yellow-500">Aid Preparations</h1>
       <div className="bg-gray-800 rounded-lg shadow-lg w-full max-w-6xl overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-700 text-gray-300 uppercase text-sm">
@@ -231,6 +239,10 @@ const AidPreparations = () => {
             {allAidPrepDetails.length > 0 ? (
               allAidPrepDetails.map((prep, index) => {
                 const { requestInfo, Status, PreparationID } = prep;
+                // Find the tracking record for this request (if any)
+                const trackingRecord = allTracking.find(
+                  (t) => Number(t.RequestID) === Number(requestInfo.RequestID)
+                );
                 return (
                   <tr
                     key={PreparationID}
@@ -241,17 +253,26 @@ const AidPreparations = () => {
                     <td className="px-6 py-4">{requestInfo.RequestType}</td>
                     <td className="px-6 py-4">{requestInfo.Description}</td>
                     <td className="px-6 py-4">{requestInfo.UrgencyLevel}</td>
-                    <td className="px-6 py-4 text-center">
-                      {requestInfo.NumberOfPeople}
-                    </td>
+                    <td className="px-6 py-4 text-center">{requestInfo.NumberOfPeople}</td>
                     <td className="px-6 py-4 text-center">
                       {Status === "Completed" ? (
-                        <button
-                          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition"
-                          onClick={() => handleSendVolunteers(prep)}
-                        >
-                          Send Volunteers to Help
-                        </button>
+                        // If a tracking record exists and is Completed, show a disabled button;
+                        // otherwise, show the button to send volunteers
+                        trackingRecord && trackingRecord.TrackingStatus === "Completed" ? (
+                          <button
+                            disabled
+                            className="bg-gray-600 text-white px-4 py-2 rounded-lg"
+                          >
+                            Tracking Completed
+                          </button>
+                        ) : (
+                          <button
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition"
+                            onClick={() => handleSendVolunteers(prep)}
+                          >
+                            Send Volunteers to Help
+                          </button>
+                        )
                       ) : (
                         <span className="text-gray-400">Ongoing</span>
                       )}
@@ -288,9 +309,7 @@ const AidPreparations = () => {
                   />
                 </div>
                 <div className="mb-6">
-                  <label className="mb-2 block font-semibold">
-                    Estimated Arrival:
-                  </label>
+                  <label className="mb-2 block font-semibold">Estimated Arrival:</label>
                   <input
                     id="estimatedArrival"
                     type="datetime-local"
@@ -322,23 +341,22 @@ const AidPreparations = () => {
                 <div className="max-h-80 overflow-y-auto">
                   {allVolunteers.length > 0 ? (
                     allVolunteers.map((volunteer) => {
-                      // Check if the volunteer is already joined based on the tracking data
-                      const isJoined = allTrackingVolunteers.some(
-                        (item) =>
-                          Number(item.VolunteerID) === Number(volunteer.VolunteerID)
-                        
-                      );
+                      // Check if the volunteer is already joined for the current tracking id
+                      const isJoined =
+                        currentTrackingData &&
+                        allTrackingVolunteers.some(
+                          (item) =>
+                            Number(item.VolunteerID) === Number(volunteer.VolunteerID) &&
+                            Number(item.TrackingID) === Number(currentTrackingData.TrackingID)
+                        );
+
                       return (
                         <div
                           key={volunteer.VolunteerID}
                           className="mb-2 border-b border-gray-600 pb-2 flex items-center justify-between"
-                        >{console.log(isJoined)}
-                        {console.log(allTrackingVolunteers)}
-                        {console.log(isJoined)}
+                        >
                           <div>
-                            <span className="font-semibold mr-2">
-                              {volunteer.Name}
-                            </span>
+                            <span className="font-semibold mr-2">{volunteer.Name}</span>
                             <span className="ml-2 text-sm">
                               {volunteer.reliefCenter?.CenterName || "N/A"}
                             </span>
@@ -352,9 +370,7 @@ const AidPreparations = () => {
                             </button>
                           ) : (
                             <button
-                              onClick={() =>
-                                handleJoinRescue(volunteer.VolunteerID)
-                              }
+                              onClick={() => handleJoinRescue(volunteer.VolunteerID)}
                               className="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded"
                             >
                               Join Rescue Team

@@ -13,6 +13,8 @@ class RescueTrackingService
         $existing = DB::selectOne("SELECT * FROM rescue_tracking WHERE RequestID = ?", [
             $data['request_id']
         ]);
+
+        // If the record exists, return it immediately
         if ($existing) {
             return $existing;
         }
@@ -25,12 +27,13 @@ class RescueTrackingService
             $data['departure_time']
         ]);
 
+        // Get the ID of the newly inserted record
         $id = DB::getPdo()->lastInsertId();
 
+        // Retrieve and return the new record by its TrackingID
         $sqlSelect = "SELECT * FROM rescue_tracking WHERE TrackingID = ?";
         return DB::selectOne($sqlSelect, [$id]);
     }
-
     public function updateTracking($id, array $data)
     {
         $sqlSelect = "SELECT * FROM rescue_tracking WHERE TrackingID = ?";
@@ -58,4 +61,10 @@ class RescueTrackingService
         $sql = "SELECT * FROM rescue_tracking WHERE TrackingID = ?";
         return DB::selectOne($sql, [$id]);
     }
+    public function getAllTracking()
+{
+    $sql = "SELECT * FROM rescue_tracking";
+    return DB::select($sql);
+}
+    
 }
