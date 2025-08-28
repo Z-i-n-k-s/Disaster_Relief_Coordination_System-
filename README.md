@@ -171,8 +171,8 @@ The devastating August 2024 Bangladesh floods affected over **5.8 million people
 
 ### 1️⃣ Clone Repository
 ```bash
-git clone https://github.com/yourusername/DRCS.git
-cd DRCS
+git clone https://github.com/Z-i-n-k-s/Disaster_Relief_Coordination_System-.git
+
 ```
 
 ### 2️⃣ Install Dependencies
